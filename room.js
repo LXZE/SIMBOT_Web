@@ -42,6 +42,17 @@ router.get('/:room_id',(req,res)=>{
 	}
 });
 
+
+router.get('/start',(req,res)=>{
+
+});
+
+router.get('/stop',(req,res)=>{
+
+});
+
+
+
 router.delete('/:room_id',(req,res)=>{
 
 	var find_room = _.find(rooms,(obj)=>{ return obj.room_id == req.params.room_id });
