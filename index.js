@@ -1,12 +1,11 @@
-var io_option = {
-	transports: ['websocket'],
-}
-
 var express = require('express');
 var app = express();
-var server = require('http').Server(app);
-var io = require('socket.io')(server);
+var io_server = require('http').Server(app);
+var io = require('socket.io')(io_server);
+var body_parser = require('body-parser');
 
+app.use(body_parser.urlencoded({ extended: false }))
+app.use(body_parser.json())
 app.use(express.static('public'));
 app.use((req,res,next)=>{
 	res.io = io;
@@ -17,13 +16,17 @@ app.get('/',(req,res)=>{
 	res.sendFile('index.html');
 });
 
-io.of('/client').on('connect',(socket)=>{
-	console.log('client bot connected')
+app.get('/watch',(req,res)=>{
+	res.sendFile('watch.html');
+});
+
+io.of('/client')
+.on('connect',(socket)=>{
+	console.log('client bot connected');
 	socket.on('disconnect',()=>{
 		console.log('client bot disconnected')
 	});
 });
-
 
 io.of('/view')
 .on('connection',(socket)=>{
@@ -34,7 +37,10 @@ io.of('/view')
 });
 
 
-server.listen(3000,()=>{
+app.use('/room',require('./room'));
+
+
+io_server.listen(3000,()=>{
 	console.log('socket listening at port 3000');
 });
 
