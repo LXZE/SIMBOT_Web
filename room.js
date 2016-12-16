@@ -3,8 +3,19 @@ var router = express.Router()
 var body_parser = require('body-parser');
 const uid = require('shortid');
 var _ = require('underscore');
+const EventEmitter = require('events');
+class MyEmitter extends EventEmitter {}
+const ev = new MyEmitter();
 
 var rooms = [];
+var findRoom = (room_id)=>{
+	return _.find(rooms,(obj)=>{ return obj.room_id == room_id })
+}
+var checkStart = (room_id)=>{
+	var room = findRoom(room_id);
+	return room ? room.room_start : false;
+}
+
 
 router.use((req,res,next)=>{
 	next();
@@ -15,16 +26,19 @@ router.post('/create',(req,res)=>{
 	var max_player_number = req.body.max_player_number || 10;
 	var player_robot_number = req.body.player_robot_number || 1;
 	var room_id = uid.generate();
+
+	var player_number = 0;
+	var room_start = false;
+	
 	var room_data = {
-		room_name: 			room_name,
-		max_player_number:	max_player_number,
-		player_robot_number:player_robot_number,
-		room_id:			room_id,
+		room_name: 				room_name,
+		max_player_number:		max_player_number,
+		player_robot_number: 	player_robot_number,
+		room_id:				room_id,
+		room_start: 			room_start,
+		player_number: 			player_number,
 	}
 	rooms.push(room_data);
-
-	// create socket
-
 	res.json(room_data);
 })
 
@@ -33,7 +47,7 @@ router.get('/',(req,res)=>{
 })
 
 router.get('/:room_id',(req,res)=>{
-	var find_room = _.find(rooms,(obj)=>{ return obj.room_id == req.params.room_id });
+	var find_room = findRoom(req.params.room_id);
 	if(find_room){
 		res.json(find_room);
 	}
@@ -43,31 +57,64 @@ router.get('/:room_id',(req,res)=>{
 });
 
 
-router.get('/start',(req,res)=>{
+router.get('/start/:room_id',(req,res)=>{
 
-});
-
-router.get('/stop',(req,res)=>{
-
-});
-
-
-
-router.delete('/:room_id',(req,res)=>{
-
-	var find_room = _.find(rooms,(obj)=>{ return obj.room_id == req.params.room_id });
+	var room_id = req.params.room_id;
+	var find_room = findRoom(room_id);
 	if(!find_room){
 		res.status(404).send('Room not found')
+		return;
+	}
+	console.log(req.io);
+	req.io.of('/client').in(room_id).emit('client_msg','client start');
+	req.io.in(room_id).emit('viewer_msg','client start');
+	console.log('start room '+room_id)
+	res.send('room started')
+});
+
+router.get('/stop/:room_id',(req,res)=>{
+
+	var room_id = req.params.room_id;
+	var find_room = findRoom(room_id);
+	if(!find_room){
+		res.status(404).send('Room not found')
+		return;
 	}
 
-	// close socket
+	req.io.of('/client').in(room_id).emit('client_msg','client stop');
+	req.io.in(room_id).emit('viewer_msg','client stop');
+	console.log('stop room '+room_id)
+	res.send('room stopped')
+});
 
+router.delete('/:room_id',(req,res)=>{
+	var find_room = findRoom(req.params.room_id);
+	if(!find_room){
+		res.status(404).send('Room not found')
+		return;
+	}
 	// delete from rooms
 	rooms = rooms.filter((obj)=>{
 		return obj.room_id != req.params.room_id;
 	})
 	res.send('Delete successfully')
-
 });
 
-module.exports = router;
+// ev.on('start',()=>{
+
+// });
+
+// ev.on('run',()=>{
+
+// })
+
+// ev.on('stop',()=>{
+
+// });
+
+module.exports = {
+	rooms: rooms,
+	findRoom: findRoom,
+	checkStart: checkStart,
+	router: router,
+};
