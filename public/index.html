@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Simbot Web Application</title>
+	<script src="/js/socket.io.min.js"></script>
+	<script>
+		var socket = io('http://localhost:3000/view');
+		socket.on('connect',()=>{
+			console.log('Connected to server')
+		});
+
+		socket.on('connect_error',(err)=>{
+			console.log(err)
+		})
+
+		socket.on('disconnect',()=>{
+			console.log('Disconnect from server')
+		});
+	</script>
+</head>
+<body>
+	Test
+</body>
+</html>
