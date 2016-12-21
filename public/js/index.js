@@ -14,7 +14,7 @@ Vue.component('room-list-pane',{
 	}
 })
 var vm = new Vue({
-	el: '#roomListPane',
+	el: '#app',
 	data:{
 		currentView:screenEnum.ROOMLIST,
 	},
