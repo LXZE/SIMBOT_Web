@@ -11,10 +11,27 @@
 		<div id="menuBar">
 			
 		</div>
-		<div id="roomListPane">
-			<room-list-pane></room-list-pane>
+		<div id="roomList">
+			<table>
+				<thead>
+					<tr>
+						<td>Room Id</td>
+						<td>Name</td>
+						<td>Players</td>
+						<td>Status</td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="room in rooms">
+						<td>{{room.id}}</td>
+						<td>{{room.name}}</td>
+						<td>{{room.playerNo}}</td>
+						<td>{{room.status}}</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
-		<div id="createRoom">
+		<div v-if="currentView==screenEnum.CREATEROOM">
 			<form>
 				<div>
 					<label for="newRoomName">Room Name</label>
@@ -33,34 +50,6 @@
 	</div>
 
 	<!-- js codes-->
-	<script type="text/x-template" id="roomListTemplate">
-		<div id="roomListPane">
-			<table>
-				<thead>
-					<tr>
-						<td>Room Id</td>
-						<td>Name</td>
-						<td>Players</td>
-						<td>Status</td>
-					</tr>
-				</thead>
-				<tbody id="roomList">
-					<tr>
-						<td>{{aroom.id}}</td>
-						<td>{{aroom.name}}</td>
-						<td>{{aroom.playerNo}}</td>
-						<td>{{aroom.status}}</td>
-					</tr>
-					<tr v-for="room in rooms">
-						<td>{{room.id}}</td>
-						<td>{{room.name}}</td>
-						<td>{{room.playerNo}}</td>
-						<td>{{room.status}}</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</script>
 	<script src="/js/socket.io.min.js"></script>
 	<script src="/js/vue.js"></script>
 	<script src="/js/index.js"></script>
