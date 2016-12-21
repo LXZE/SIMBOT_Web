@@ -2,8 +2,11 @@ var screenEnum={
 	ROOMLIST:0,
 	CREATEROOM:1,
 }
+Vue.component('room-list-pane',{
+	template:Document.getElementById('roomListTemplate').innerHTML(),
+})
 var vm = new Vue({
-	el: '#roomList',
+	el: '#roomListPane',
 	data:{
 		currentView:screenEnum.ROOMLIST,
 		rooms:[{
