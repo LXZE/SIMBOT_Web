@@ -3,7 +3,7 @@ var screenEnum={
 	CREATEROOM:1,
 }
 var vm = new Vue({
-	el: '#app',
+	el: '#roomList',
 	data:{
 		currentView:screenEnum.ROOMLIST,
 		rooms:[{
