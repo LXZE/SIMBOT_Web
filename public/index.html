@@ -6,45 +6,47 @@
 	<link rel="stylesheet" href="https://cdn.concisecss.com/concise.min.css">
 	<link rel="stylesheet" href="/css/index.css">
 </head>
-<body id="app">
-	<div id="menuBar">
-		
-	</div>
-	<div v-if="currentView==screenEnum.ROOMLIST">
-		<table>
-			<thead>
-				<tr>
-					<td>Room Id</td>
-					<td>Name</td>
-					<td>Players</td>
-					<td>Status</td>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="room in rooms">
-					<td>{{room.id}}</td>
-					<td>{{room.name}}</td>
-					<td>{{room.playerNo}}</td>
-					<td>{{room.status}}</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	<div v-if="currentView==screenEnum.CREATEROOM">
-		<form>
-			<div>
-				<label for="newRoomName">Room Name</label>
-				<input type="text" name="newRoomName">
-			</div>
-			<div>
-				<label for="newRoomMaxPlayer"></label>
-				<input type="number" name="newRoomMaxPlayer" min="1" max="8" step="1">
-			</div>
-			<div>
-				<label for="newRoomBotAmt"></label>
-				<input type="number" name="newRoomBotAmt" min="1" max="8" step="1">
-			</div>
-		</form>
+<body>
+	<div id="app">
+		<div id="menuBar">
+			
+		</div>
+		<div v-if="currentView==screenEnum.ROOMLIST">
+			<table>
+				<thead>
+					<tr>
+						<td>Room Id</td>
+						<td>Name</td>
+						<td>Players</td>
+						<td>Status</td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="room in rooms">
+						<td>{{room.id}}</td>
+						<td>{{room.name}}</td>
+						<td>{{room.playerNo}}</td>
+						<td>{{room.status}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div v-if="currentView==screenEnum.CREATEROOM">
+			<form>
+				<div>
+					<label for="newRoomName">Room Name</label>
+					<input type="text" name="newRoomName">
+				</div>
+				<div>
+					<label for="newRoomMaxPlayer"></label>
+					<input type="number" name="newRoomMaxPlayer" min="1" max="8" step="1">
+				</div>
+				<div>
+					<label for="newRoomBotAmt"></label>
+					<input type="number" name="newRoomBotAmt" min="1" max="8" step="1">
+				</div>
+			</form>
+		</div>
 	</div>
 
 	<!-- js codes-->
