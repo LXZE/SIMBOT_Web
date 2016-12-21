@@ -5,12 +5,7 @@ var screenEnum={
 Vue.component('room-list-pane',{
 	template:document.getElementById('roomListTemplate').innerHTML,
 	data:{
-		rooms:[{
-			id: 1,
-			name: 'sample room',
-			playerNo: '3',
-			status:'Running',
-		}]
+		rooms: getRoomList()
 	}
 })
 var vm = new Vue({
@@ -25,3 +20,13 @@ var vm = new Vue({
 
 	},
 })
+function getRoomList(){
+	//mock up data
+	return sampleRoomsList;
+}
+var sampleRoomsList = [{
+	id: 1,
+	name: 'sample room',
+	playerNo: '3',
+	status:'Running',
+}]
