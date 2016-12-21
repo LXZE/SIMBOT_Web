@@ -11,7 +11,7 @@
 		<div id="menuBar">
 			
 		</div>
-		<div id="roomList">
+		<div id="roomListPane">
 			<table>
 				<thead>
 					<tr>
@@ -21,7 +21,7 @@
 						<td>Status</td>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody id="roomList">
 					<tr v-for="room in rooms">
 						<td>{{room.id}}</td>
 						<td>{{room.name}}</td>
@@ -31,7 +31,7 @@
 				</tbody>
 			</table>
 		</div>
-		<div v-if="currentView==screenEnum.CREATEROOM">
+		<div id="createRoom">
 			<form>
 				<div>
 					<label for="newRoomName">Room Name</label>
