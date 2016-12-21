@@ -45,6 +45,12 @@
 					</tr>
 				</thead>
 				<tbody id="roomList">
+					<tr>
+						<td>{{aroom.id}}</td>
+						<td>{{aroom.name}}</td>
+						<td>{{aroom.playerNo}}</td>
+						<td>{{aroom.status}}</td>
+					</tr>
 					<tr v-for="room in rooms">
 						<td>{{room.id}}</td>
 						<td>{{room.name}}</td>

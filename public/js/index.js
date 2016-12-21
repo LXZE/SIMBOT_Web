@@ -9,7 +9,12 @@ function getRoomList(){
 Vue.component('room-list-pane',{
 	template:document.getElementById('roomListTemplate').innerHTML,
 	data:{
-		rooms: function(){return getRoomList()},
+		rooms: function(){
+			return getRoomList()
+		},
+		aroom:function(){
+			return sampleRoomsList[0]
+		},
 	}
 })
 var vm = new Vue({
