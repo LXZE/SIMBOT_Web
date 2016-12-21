@@ -3,7 +3,7 @@ var screenEnum={
 	CREATEROOM:1,
 }
 Vue.component('room-list-pane',{
-	template:document.getElementById('roomListTemplate').innerHTML(),
+	template:document.getElementById('roomListTemplate').innerHTML,
 	data:{
 		rooms:[{
 			id: 1,
