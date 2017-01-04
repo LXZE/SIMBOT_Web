@@ -4,16 +4,30 @@
   "description": "Web based Robot Simulation",
   "main": "index.js",
   "scripts": {
+    "watch": "gulp scripts",
+    "start": "npm run watch && supervisor dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "amqp": "^0.2.6",
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "shortid": "^2.2.6",
     "socket.io": "^1.7.2",
     "socket.io-client": "^1.7.2",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "ws": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/body-parser": "0.0.33",
+    "@types/express": "^4.0.34",
+    "@types/node": "^6.0.56",
+    "gulp": "^3.9.1",
+    "gulp-typescript": "^3.1.3",
+    "supervisor": "^0.12.0",
+    "ts-node": "^2.0.0",
+    "typescript": "^2.1.4"
   }
 }

@@ -3,10 +3,64 @@ var router = express.Router()
 var body_parser = require('body-parser');
 const uid = require('shortid');
 var _ = require('underscore');
-const EventEmitter = require('events');
-class MyEmitter extends EventEmitter {}
-const ev = new MyEmitter();
+// const EventEmitter = require('events');
+// class MyEmitter extends EventEmitter {}
+// const ev = new MyEmitter();
+import { EventEmitter } from "events";
+import 
 
+export class Room extends EventEmitter { 
+	constructor(options){
+		super();
+		this.roomID = options.roomID;
+		this.roomName = options.roomName;
+		this.maxPlayerNumber = options.maxPlayerNumber;
+		this.lock = false
+		this.state = 'unlock';
+
+	}
+
+	requestJoin(){
+		return !this.lock
+	}
+
+	broadcast(){
+
+	}
+
+	lock(){
+		this.emit('lock');
+		this.lock = true;
+	}
+
+	unlock(){
+		this.emit('unlock');
+		this.lock = false;
+	}
+
+	onJoin(client){
+		if(this.requestJoin())
+			this.clients.push(client);
+
+		// confirm roomID
+		// client.send('');
+
+
+	}
+
+	onConnect(){
+
+	}
+
+	onMessage(){
+
+	}
+
+	onLeave(){
+
+	}
+}
+/*
 var rooms = [];
 var findRoom = (room_id)=>{
 	return _.find(rooms,(obj)=>{ return obj.room_id == room_id })
@@ -118,3 +172,5 @@ module.exports = {
 	checkStart: checkStart,
 	router: router,
 };
+*/
+
