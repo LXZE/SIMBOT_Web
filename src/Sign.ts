@@ -6,7 +6,6 @@ export enum Sign {
 
 	CLIENT_JOIN = 5,
 	CLIENT_LEAVE = 6,
-
 	CLIENT_WAIT = 7,
 
 	CLIENT_ERR = 9,

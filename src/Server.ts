@@ -24,7 +24,7 @@ export class Server extends EventEmitter{
 		return this.handler.getRoomList();
 	}
 
-	public getRoomInfo(roomID:number): {}{
+	public getRoomInfo(roomID:number): Room<any>{
 		return this.handler.getRoomByID(roomID);
 	}
 
@@ -53,9 +53,17 @@ export class Server extends EventEmitter{
 		return room;
 	}
 
-	public deleteRoom(roomID:number){
+	public deleteRoom(roomID:number,callback?:Function){
 		// TODO : remove all of client in room
 		this.handler.delete(roomID);
+	}
+
+	public startRoom(roomID:number,callback:(err:any,pass:boolean)=>any = ()=>{}){
+		this.handler.startRoom(roomID,callback);
+	}
+
+	public stopRoom(roomID:number,callback:(err:any,pass:boolean)=>any = ()=>{}){
+		this.handler.stopRoom(roomID,callback);
 	}
 
 	private onError (client: Client, e: any) {
@@ -109,15 +117,19 @@ export class Server extends EventEmitter{
 
 	private onJoinRoomRequest(client:Client, roomID:number): Room<any>{
 		let room: Room<any>;
-		room = this.handler.joinByID(client,roomID);
-		if(room){
-			room.once('leave',this.onClientLeaveRoom.bind(this,room));
-			this.clients[client.id].push(room);
+		if(this.handler.hasRoom(roomID)){
+			room = this.handler.joinByID(client,roomID);
+			if(room){
+				room.once('leave',this.onClientLeaveRoom.bind(this,room));
+				this.clients[client.id].push(room);
+			}else{
+				throw new Error('Join request Failed');
+			}
+			console.log(`Client ${client.data.name} join to room ${room.roomName}[${room.roomID}]`)
+			return room;
 		}else{
-			throw new Error('Join request Failed');
+			throw new Error('room not found');
 		}
-		console.log(`Client ${client.data.name} join to room ${room.roomName}[${room.roomID}]`)
-		return room;
 	}
 
 	private onClientLeaveRoom(room: Room<any>,client:Client, isDisconnect:boolean): boolean{

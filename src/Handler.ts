@@ -11,12 +11,32 @@ export class Handler{
 		return this.roomList[ roomID ] ? true : false;
 	}
 
-	public startRoom(roomID: number){
-		this.roomList[roomID].startRoom();
+	public startRoom(roomID: number,callback: (err:any,pass:boolean)=>any){
+		let room = this.roomList[roomID];
+		if(!room){
+			callback('room not found',false);
+		}
+		if(!room.getCurrentLock()){
+			room.lockRoom();
+			room.start();
+			callback(null,true);
+		}else{
+			callback('room locked',false);
+		}
 	}
 
-	public stopRoom(roomID: number){
-		this.roomList[roomID].stopRoom();
+	public stopRoom(roomID: number,callback: (err:any,pass:boolean)=>any){
+		let room = this.roomList[roomID];
+		if(!room){
+			callback('room not found',false);
+		}
+		if(room.getCurrentLock()){
+			room.stop();
+			room.unlockRoom();
+			callback(null,true);
+		}else{
+			callback('room isnt locked',false);
+		}
 	}
 
 	public getRoomByID(roomID: number): Room<any>{
@@ -51,13 +71,6 @@ export class Handler{
 
 		room = new Room(roomOptions);
 		this.roomList[roomOptions.roomID] = room;
-		if(room.requestJoin()){
-			room.on('lock', this.lockRoom.bind(this, roomName, room));
-			room.on('unlock', this.unlockRoom.bind(this, roomName, room));
-			room.once('dispose', this.disposeRoom.bind(this, roomName, room));
-		}else{
-			room = null;
-		}
 		return room;
 	}
 
@@ -65,13 +78,6 @@ export class Handler{
 		this.disposeRoom(roomID,this.roomList[roomID]);
 	}
 
-	private lockRoom(roomID:number, room:Room<any>): void{
-		room.lockRoom();
-	}
-
-	private unlockRoom(roomID:number, room:Room<any>): void{
-		room.unlockRoom();
-	}
 	private disposeRoom(roomID: number, room: Room<any>): void {
 		delete this.roomList[roomID];
 		room.lockRoom();

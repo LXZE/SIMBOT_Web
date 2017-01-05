@@ -4,6 +4,7 @@ import * as bodyParser from 'body-parser';
 // import * as WebSocket from "ws";
 import * as uid from "shortid";
 import { SV } from './index';
+import { Room } from './Room';
 import * as util from 'util';
 
 class App {
@@ -34,15 +35,17 @@ class App {
 		});
 
 		router.get('/room/:roomID',(req,res)=>{
-			let roomInfo = SV.getRoomInfo(req.params.roomID);
+			let roomInfo:Room<any> = SV.getRoomInfo(req.params.roomID);
 			res.send(				
 					util.inspect(
-						roomInfo
+						{
+							clientAmount: roomInfo.getClientAmount(),
+							options: roomInfo.options
+						}
+					
 						,false,null
 					)
-
 			);
-
 		});
 
 		router.post('/create',(req,res)=>{
@@ -56,10 +59,22 @@ class App {
 		});
 
 		router.get('/start/:roomID',(req,res)=>{
-
+			SV.startRoom(req.params.roomID,(err,pass)=>{
+				if(pass){
+					res.json({'success':true});
+				}else{
+					res.json({'success':false,'error':err});
+				}
+			});
 		});
 		router.get('/stop/:roomID',(req,res)=>{
-
+			SV.stopRoom(req.params.roomID,(err,pass)=>{
+				if(pass){
+					res.json({'success':true});
+				}else{
+					res.json({'success':false,'error':err});
+				}
+			});
 		});
 		router.delete('/:roomID',(req,res)=>{
 			SV.deleteRoom(req.params.roomID);
