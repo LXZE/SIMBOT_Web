@@ -3,12 +3,6 @@ import { Client } from "./index";
 import * as msgpack from "msgpack-lite";
 import { Sign } from "./Sign";
 
-export interface RobotData{
-	x?: number,
-	y?: number,
-	smell?: number
-}
-
 export class Room<Type> extends EventEmitter{
 	public roomID: number;
 	public roomName: string;
