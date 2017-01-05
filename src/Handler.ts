@@ -34,6 +34,7 @@ export class Handler{
 		let room = this.roomList[ roomID ];
 		if(!room) { throw new Error(`room doesn't exit`); }
 		if(!room.requestJoin()){ throw new Error(`Can't join room`); }
+		if(!room)
 		(<any>room)._onJoin(client);
 		return room;
 	}

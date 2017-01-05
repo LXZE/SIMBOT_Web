@@ -65,17 +65,25 @@ export class Server extends EventEmitter{
 			return;
 		}
 		switch (data[0]) {
-			case 2:
+			case Sign.CLIENT_NAME:
 				client.name = data[1];
+				console.log(`Client ${client.name} connected`);
 				break;
-			case 3:
+			case Sign.CLIENT_TOKEN:
 				if(uid.isValid(data[1]))
 					client.token = data[1];
 				else{
-					console.log(`Kick client ${client.name || "anonymous"} because no token`)
+					console.log(`Kick client ${client.name || "anonymous"} because of no token`)
 					client.close();
 				}
-				break
+				break;
+			case Sign.CLIENT_JOIN:
+				try{
+					this.onJoinRoomRequest(client,data[1]);
+				}catch(e){
+					client.send(msgpack.encode([Sign.CLIENT_ERR,e.message,`Join room error`]),this.msgOption);
+				}
+				break;
 			default:
 				try{
 					console.log(data[2]);
