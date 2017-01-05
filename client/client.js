@@ -1,39 +1,45 @@
 var WebSocket = require('ws');
 var ws = new WebSocket('ws://localhost:8888/');
+var msgpack = require("msgpack-lite");
 
+var clientName = 'LXZE_ZAA123';
+var clientID = '';
+var clientToken = 'Skq9c3iBl';
+var msgOptions = {binary: true};
 ws.on('open', function open() {
-	console.log('Connect to server successfully')
-	ws.send('Connection requested from client 1');
+	console.log('Connect to server successfully, now Authen with name and token');
+	var message = msgpack.encode([2,clientName,`Client ${clientName} connected to server`])
+	ws.send(message,msgOptions);
+	message = msgpack.encode([3,clientToken,`Client ${clientName} authen with token`])
+	ws.send(message,msgOptions);
+	console.log('Authen Success');
 });
 
-ws.on('message', function(data, flags) {
+ws.on('message', function(message, flags) {
+	let data = msgpack.decode(message);
 	console.log(data);
-  // flags.binary will be set if a binary data is received.
-  // flags.masked will be set if the data was masked.
+	switch(data[0]){
+		case 1:
+			clientID = data[1]
+			console.log(data[2])
+			break;
+		default:
+			break;
+	}
 });
 
-
+var disconn = function(){
+	ws.close();
+}
 ws.on('disconnect',()=>{
-	console.log('disconnect from server');
+	console.log('Disconnected from server');
 })
 
+ws.on('close',()=>{
+	console.log('Disconnected from server');
+})
 
-// var socket = require('socket.io-client')('http://localhost:3000/client');
-// var room_id = ''
-// socket.on('connect',()=>{
-// 	console.log('Connected to server')
-// 	socket.emit('join_room',room_id);
-// });
-
-// socket.on('client_msg',(msg)=>{
-// 	console.log(msg)
-// })
-
-// socket.on('connect_error',(err)=>{
-// 	console.log(err)
-// })
-
-// socket.on('disconnect',()=>{
-// 	// socket.emit('leave_room',room_id);
-// 	console.log('Disconnect from server')
-// });
+process.on('SIGINT', () => {
+  console.log(`About to exit`);
+  disconn();
+});

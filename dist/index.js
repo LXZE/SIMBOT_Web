@@ -8,3 +8,4 @@ const httpServer = http.createServer(app_1.default);
 const botServer = new Server_1.Server({ server: httpServer });
 httpServer.listen(port);
 console.log(`Server listening on http://localhost:${port}`);
+exports.SV = botServer;
