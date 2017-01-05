@@ -1,13 +1,14 @@
 import { EventEmitter } from "events";
 import { Client } from "./index";
 import * as msgpack from "msgpack-lite";
+import { Sign } from "./Sign";
 
 export class Room<T> extends EventEmitter{
 	public roomID: number;
 	public roomName: string;
 
 	protected clients: Client[] = [];
-	protected options: any;
+	public options: any;
 
 	public state: T;
 	protected prevState: any;
@@ -15,14 +16,16 @@ export class Room<T> extends EventEmitter{
 	public maxPlayer: number;
 	protected lock: boolean;
 
+	private msgOption:{} = {binary:true};
+
 	constructor(options: any = {}){
 		super();
 
 		this.roomID = options.roomID;
 		this.roomName = options.roomName;
-		this.options = options;
-
 		this.maxPlayer = options.maxPlayer;
+
+		this.options = options;
 		this.lock = false;
 
 	}
@@ -36,6 +39,25 @@ export class Room<T> extends EventEmitter{
 		this.state = newState;
 	}
 
+	public startRoom(){
+		if(this.lock){
+			this.runSimulation();
+		}
+	}
+
+	public stopRoom(){
+		this.stopSimulation();
+	}
+
+	private runSimulation(){
+		// TODO : RUN simulation in each iteration
+	}
+
+	private stopSimulation(){
+		// TODO : Stop simulation
+	}
+
+
 	public lockRoom():void{
 		this.emit('lock');
 		this.lock = true;
@@ -47,7 +69,17 @@ export class Room<T> extends EventEmitter{
 	}
 
 	public send(client:Client, data:any): void{
-		client.send(data);
+		let msg = msgpack.encode([Sign.ROOM_DATA,data]);
+		client.send(msg,this.msgOption);
+	}
+
+	private sendState(client:Client): void{
+
+	}
+
+	public broadcast(data:any){
+		data = msgpack.encode([Sign.ROOM_DATA])
+		this.clients.forEach(client => client.send(data,this.msgOption));
 	}
 
 	public onMessage(client:Client, data:any): void{
@@ -56,24 +88,25 @@ export class Room<T> extends EventEmitter{
 	}
 
 	public onJoin(client:Client, options:any): void{
-		// this.state
+		// send waiting for action to client
+		let msg = msgpack.encode([Sign.CLIENT_WAIT,0,`Wait until room ${this.roomID} start`]);
+		client.send(msg,this.msgOption);
 	}
 
 	public onLeave(client:Client): void{
-		// this.state.message
+		// do noting
+
 	}
 
 	public onDispose(){
 		console.log('Dispose room');
 	}
 
-
 	private _onJoin(client:Client, options?:any): void{
 		this.clients.push(client);
-
-		if(this.state){
-			// this.sendState(client);
-		}
+		// if(this.state){
+		// 	this.sendState(client);
+		// }
 		if(this.onJoin){
 			this.onJoin(client,options);
 		}
@@ -84,7 +117,7 @@ export class Room<T> extends EventEmitter{
 		this.emit('leave', client, isDisconnect);
 
 		if (!isDisconnect) {
-			// client.send('disconnect');
+			client.send(msgpack.encode([Sign.ROOM_LEAVE,this.roomID]),this.msgOption);			
 		}
 	}
 

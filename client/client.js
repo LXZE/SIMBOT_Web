@@ -1,42 +1,69 @@
 var WebSocket = require('ws');
 var ws = new WebSocket('ws://localhost:8888/');
 var msgpack = require("msgpack-lite");
-var Sign = require('../dist/Sign');
+var Sign = require('../dist/Sign').Sign;
 
-var clientName = 'LXZE_ZAA123';
+var clientName = 'LXZE';
 var clientID = '';
-var clientToken = 'Skq9c3iBl';
+var clientToken = 'Sy9OTznHg';
+var roomID = '0';
 var msgOptions = {binary: true};
+var status = '';
+
+var disconn = ()=>{
+	ws.close();
+}
+var encode = (data)=>{
+	return msgpack.encode(data);
+}
+
+var leaving = ()=>{
+	ws.send(encode([Sign.CLIENT_LEAVE,null,null]));
+	disconn();
+}
 
 ws.on('open', function open() {
 	console.log('Connect to server successfully, now Authen with name and token');
 
 	// Send Name
-	var message = msgpack.encode([2,clientName,`Client ${clientName} connected to server`])
+	var message = encode([Sign.CLIENT_NAME,clientName,`Client ${clientName} connected to server`])
 	ws.send(message,msgOptions);
 	
 	// Send Token
-	message = msgpack.encode([3,clientToken,`Client ${clientName} authen with token`])
+	message = encode([Sign.CLIENT_TOKEN,clientToken,`Client ${clientName} authen with token`])
 	ws.send(message,msgOptions);
 	console.log('Authen Success');
+
+	// join room
+	message = encode([Sign.CLIENT_JOIN,roomID,`Client ${clientName} join room ID ${roomID}`]);
+	ws.send(message,msgOptions);
+	console.log('Sending join request');
+
 });
 
 ws.on('message', function(message, flags) {
 	let data = msgpack.decode(message);
-	console.log(data);
 	switch(data[0]){
-		case 1:
-			clientID = data[1]
-			console.log(data[2])
+		case Sign.CLIENT_ID:
+			clientID = data[1];
+			break;
+		case Sign.CLIENT_ERR:
+			console.error(data[1]);
+			disconn();
+			break;
+		case Sign.CLIENT_WAIT:
+			console.log('Waiting room to start');
+			status = 'waiting';
+			break;
+		case Sign.ROOM_LEAVE:
+			disconn();
 			break;
 		default:
+			console.log(data[2])
 			break;
 	}
 });
 
-var disconn = function(){
-	ws.close();
-}
 ws.on('disconnect',()=>{
 	console.log('Disconnected from server');
 })
@@ -47,5 +74,8 @@ ws.on('close',()=>{
 
 process.on('SIGINT', () => {
   console.log(`About to exit`);
-  disconn();
+  if(status == 'waiting')
+  	leaving();
+  else
+  	disconn();
 });
