@@ -37,12 +37,23 @@ class App {
 			var options = {
 				max_player_number: req.body.max_player_number || 10,
 				player_robot_number: req.body.player_robot_number || 1,
-				player_number: 0,
 			}
 			var roomData = SV.createRoom(roomName,options);
 			res.json(roomData);
 		});
 
+		router.get('/info/:roomID',(req,res)=>{
+			res.json(SV.getRoomInfo(req.params.roomID));
+		});
+		router.get('/start/:roomID',(req,res)=>{
+
+		});
+		router.get('/stop/:roomID',(req,res)=>{
+
+		});
+		router.delete('/:roomID',(req,res)=>{
+
+		});
 		this.express.use('/', router);
 	}
 

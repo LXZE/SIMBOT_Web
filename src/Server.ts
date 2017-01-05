@@ -24,6 +24,10 @@ export class Server extends EventEmitter{
 		return this.handler.getRoomList();
 	}
 
+	public getRoomInfo(roomID:number): {}{
+		return this.handler.getRoomByID(roomID);
+	}
+
 	private onConnect = (client:Client) => {
 		let clientID = uid.generate();
 		client.id = clientID;
@@ -45,6 +49,7 @@ export class Server extends EventEmitter{
 		}else{
 			throw new Error('Create room failed');
 		}
+		console.log(`Room ${room.roomID} created`);
 		return room;
 	}
 
