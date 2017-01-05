@@ -57,6 +57,7 @@ export class Room<Type> extends EventEmitter{
 						step: 0,
 						x: Math.random()*1024,
 						y: Math.random()*768,
+						IR: [255,255,255,255,255,255,255,255],
 						smell: (Math.random()*360)-180,
 					})
 				}
