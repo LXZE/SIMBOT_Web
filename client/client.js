@@ -83,7 +83,7 @@ ws.on('message', function(message, flags) {
 			disconn();
 			break;
 		case Sign.ROOM_DATA:
-			console.log(data[1][0].step);
+			console.log(data[1]);
 			break;
 		default:
 			console.log(data[2])

@@ -2,6 +2,7 @@ import { EventEmitter } from "events";
 import { Client } from "./index";
 import * as msgpack from "msgpack-lite";
 import { Sign } from "./Sign";
+import { Robot } from './Robot';
 
 export class Room<Type> extends EventEmitter{
 	public roomID: number;
@@ -52,13 +53,13 @@ export class Room<Type> extends EventEmitter{
 				this.state[client.id] = [];
 				let n = this.options.robotPerPlayer ;
 				while(n--){
+					// TODO : Create new robot instance
+					let newRobot = new Robot({
+						ownerID:client.id,
+						ownerName:client.data.name});
 					this.state[client.id].push({
-						owner: client.data.name,
-						step: 0,
-						x: Math.random()*1024,
-						y: Math.random()*768,
-						IR: [255,255,255,255,255,255,255,255],
-						smell: (Math.random()*360)-180,
+						step:0,
+						robot:newRobot,
 					})
 				}
 			});
@@ -79,13 +80,13 @@ export class Room<Type> extends EventEmitter{
 			this.broadcast(this.state);
 			this.step++;
 			console.log('step = ',this.step);
-		},10);
+		},1000);
 	}
 
 	private calculate(){
 		Object.keys(this.state).forEach(clientID=>{
 			this.state[clientID].forEach(robot=>{
-				robot.step = this.step;
+				robot.step++;
 			})
 		});
 	}
