@@ -11,6 +11,7 @@ or `npm run dev` on OSX, Linux
 
 ```bash
 git clone https://github.com/LXZE/SIMBOT_Web.git
+cd SIMBOT_Web
 npm install
 npm start
 ```
@@ -19,6 +20,7 @@ npm start
 
 ```bash
 git clone https://github.com/LXZE/SIMBOT_Web.git
+cd SIMBOT_Web
 npm install
 npm run dev
 ```
