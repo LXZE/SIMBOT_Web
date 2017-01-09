@@ -36,23 +36,17 @@ class App {
 
 		router.get('/room/:roomID',(req,res)=>{
 			let roomInfo:Room<any> = SV.getRoomInfo(req.params.roomID);
-			res.send(				
-					util.inspect(
-						{
-							clientAmount: roomInfo.getClientAmount(),
-							options: roomInfo.options
-						}
-					
-						,false,null
-					)
-			);
+			if(roomInfo)
+				res.json({clientAmount: roomInfo.getClientAmount(),options: roomInfo.options,lock: roomInfo.getCurrentLock()});
+			else
+				res.status(404).send(`Room ${req.params.roomID} not found`)
 		});
 
 		router.post('/create',(req,res)=>{
 			var roomName = req.body.roomName || 'Untitled';
 			var options = {
 				maxPlayer: req.body.maxPlayer || 10,
-				robotPerPlayer: req.body.robotPerPlayer || 1,
+				robotPerPlayer: req.body.robotPerPlayer || 2,
 			}
 			var roomData = SV.createRoom(roomName,options);
 			res.json(roomData);
@@ -76,12 +70,29 @@ class App {
 				}
 			});
 		});
+		router.get('/pause/:roomID',(req,res)=>{
+			SV.pauseRoom(req.params.roomID,(err,pass)=>{
+				if(pass){
+					res.json({'success':true});
+				}else{
+					res.json({'success':false,'error':err});
+				}
+			});
+		});
+		router.get('/resume/:roomID',(req,res)=>{
+			SV.resumeRoom(req.params.roomID,(err,pass)=>{
+				if(pass){
+					res.json({'success':true});
+				}else{
+					res.json({'success':false,'error':err});
+				}
+			});
+		});
 		router.delete('/:roomID',(req,res)=>{
 			SV.deleteRoom(req.params.roomID);
 			res.json({'success':true});
 		});
 		this.express.use('/', router);
 	}
-
 }
 export default new App().express;

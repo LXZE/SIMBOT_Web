@@ -49,7 +49,7 @@ export class Server extends EventEmitter{
 		}else{
 			throw new Error('Create room failed');
 		}
-		console.log(`Room ${room.roomID} created`);
+		console.log(`Room ${room.roomName}[${room.roomID}] created`);
 		return room;
 	}
 
@@ -65,6 +65,16 @@ export class Server extends EventEmitter{
 	public stopRoom(roomID:number,callback:(err:any,pass:boolean)=>any = ()=>{}){
 		this.handler.stopRoom(roomID,callback);
 	}
+
+	public pauseRoom(roomID:number,callback:(err:any,pass:boolean)=>any = ()=>{}){
+		this.handler.pauseRoom(roomID,callback);
+	}
+
+	public resumeRoom(roomID:number,callback:(err:any,pass:boolean)=>any = ()=>{}){
+		this.handler.resumeRoom(roomID,callback);
+	}
+
+
 
 	private onError (client: Client, e: any) {
 		console.error("[ERROR]", client.id, e)

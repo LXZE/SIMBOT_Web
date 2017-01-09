@@ -1,5 +1,6 @@
 import { Room } from './Room';
 import { Client } from './index';
+import { Sign } from './Sign';
 import * as uid from 'shortid';
 
 export class Handler{
@@ -16,12 +17,12 @@ export class Handler{
 		if(!room){
 			callback('room not found',false);
 		}
-		if(!room.getCurrentLock()){
+		if(!room.getCurrentLock() && room.getCurrentStatus() == Sign.ROOM_STOP){
 			room.lockRoom();
 			room.start();
 			callback(null,true);
 		}else{
-			callback('room locked',false);
+			callback('room already started',false);
 		}
 	}
 
@@ -30,12 +31,38 @@ export class Handler{
 		if(!room){
 			callback('room not found',false);
 		}
-		if(room.getCurrentLock()){
+		if(room.getCurrentLock() && room.getCurrentStatus() !== Sign.ROOM_STOP){
 			room.stop();
 			room.unlockRoom();
 			callback(null,true);
 		}else{
-			callback('room isnt locked',false);
+			callback('room already stop',false);
+		}
+	}
+
+	public pauseRoom(roomID:number,callback: (err:any,pass:boolean)=>any){
+		let room = this.roomList[roomID];
+		if(!room){
+			callback('room not found',false);
+		}
+		if(room.getCurrentLock() && room.getCurrentStatus() !== Sign.ROOM_PAUSE){
+			room.pause();
+			callback(null,true);
+		}else{
+			callback('room is paused',false);
+		}
+	}
+
+	public resumeRoom(roomID:number, callback: (err:any,pass:boolean)=>any){
+		let room = this.roomList[roomID];
+		if(!room){
+			callback('room not found',false);
+		}
+		if(room.getCurrentLock() && room.getCurrentStatus() !== Sign.ROOM_RUN){
+			room.resume();
+			callback(null,true);
+		}else{
+			callback('room is running',false);
 		}
 	}
 
@@ -68,13 +95,14 @@ export class Handler{
 		roomOptions.roomID = this.roomCount++;
 		roomOptions.roomName = roomName;
 		roomOptions.roomToken = uid.generate();
+		roomOptions.movementType = options.movementType || Sign.CONTINUE_MOTION;
 
 		room = new Room(roomOptions);
 		this.roomList[roomOptions.roomID] = room;
 		return room;
 	}
 
-	public delete(roomID:number): void{
+	public delete(roomID:number,callback: (err:any,pass:boolean)=>any = ()=>{}): void{
 		this.disposeRoom(roomID,this.roomList[roomID]);
 	}
 
