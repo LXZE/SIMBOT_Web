@@ -1,3 +1,5 @@
+import { Point } from './matchController';
+
 interface Obstacle{
 	x1:number,
 	x2?:number,
@@ -7,12 +9,9 @@ interface Obstacle{
 
 export abstract class Map{
 
-	private Food_x:number;
-	private Food_y:number;
-
-	private obstacle:Obstacle[];
+	protected Food:Point;
+	protected obstacle:Obstacle[];
 
 	constructor(options:any = {}){
-		
 	}
 }
