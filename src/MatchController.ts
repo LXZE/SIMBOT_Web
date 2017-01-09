@@ -2,17 +2,22 @@ import { Room } from './Room';
 import { Map } from './Map';
 import { Robot} from './Robot';
 
-export class Point{
-	public x:number;
-	public y:number;
+interface Point{
+	x:number,
+	y:number,
 }
-class Square extends Point{
+interface Square{
 	//anchor point top-left of the object
-	public width: number;
-	public height: number;
+	x:number,
+	y:number,
+	width: number,
+	height: number,
 }
-class circle extends Point{
-	public radius: number;
+interface circle{
+	//anchor point to center of circle
+	x:number,
+	y:number,
+	radius: number,
 }
 
 export class MatchController{
@@ -20,10 +25,10 @@ export class MatchController{
 	private robotList:Robot[];
 	private map:Map;
 
-	constructor(options:any = {}){
-		//TODO: link room to room var
+	constructor(room:Room,robots:Robot[],options:any = {}){
+		this.room = room;
+		this.robotList = robots;
 		//TODO: instance a map
-		//TODO: instance or load robots
 	}
 	private squareCollided(A:Square, B:Square,countTouchAsCollide:boolean=false):boolean{
 		if(countTouchAsCollide)
@@ -40,5 +45,8 @@ export class MatchController{
 			return dist<=(A.radius+B.radius);
 		else
 			return dist<(A.radius+B.radius);
+	}
+	public getFoodPosition():Point{
+		return map.foodPosition;
 	}
 }
