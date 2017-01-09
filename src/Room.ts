@@ -1,39 +1,102 @@
 import { EventEmitter } from "events";
 import { Client } from "./index";
 import * as msgpack from "msgpack-lite";
+import { Sign } from "./Sign";
+import { Robot } from './Robot';
 
-export class Room<T> extends EventEmitter{
+export class Room<Type> extends EventEmitter{
 	public roomID: number;
 	public roomName: string;
 
 	protected clients: Client[] = [];
-	protected options: any;
+	public options: any;
 
-	public state: T;
+	private state: { [clientID:string]:any[] } = {};
 	protected prevState: any;
 
+	protected iteration: NodeJS.Timer;
+	protected step:number = 0;
 	public maxPlayer: number;
 	protected lock: boolean;
+
+	private msgOption:{} = {binary:true};
 
 	constructor(options: any = {}){
 		super();
 
 		this.roomID = options.roomID;
 		this.roomName = options.roomName;
-		this.options = options;
-
 		this.maxPlayer = options.maxPlayer;
+		this.options = options;
 		this.lock = false;
 
 	}
 
+	public getClientAmount(): number{
+		return this.clients.length;
+	}
+
 	public requestJoin(): boolean{
-		return !this.lock;
+		return !this.lock || this.clients.length < this.maxPlayer;
 	}
 
 	public setState(newState){
 		this.prevState = this.state;
 		this.state = newState;
+	}
+
+	public start(){
+		if(this.lock){
+			console.log(`Room ${this.roomID} start Simulation`);
+			console.log(this.options);
+			this.clients.forEach(client => {
+				this.state[client.id] = [];
+				let n = this.options.robotPerPlayer ;
+				while(n--){
+					// TODO : Create new robot instance
+					let newRobot = new Robot({
+						ownerID:client.id,
+						ownerName:client.data.name});
+					this.state[client.id].push({
+						step:0,
+						robot:newRobot,
+					})
+				}
+			});
+			this.runSimulation();
+		}
+	}
+
+	public stop(){
+		console.log(`Room ${this.roomID} stop Simulation`);
+		this.stopSimulation();
+	}
+
+	private runSimulation(){
+		// TODO : RUN simulation in each iteration
+		if(this.iteration) clearInterval(this.iteration);
+		this.iteration = setInterval(()=>{
+			this.calculate();
+			this.broadcast(this.state);
+			this.step++;
+			console.log('step = ',this.step);
+		},1000);
+	}
+
+	private calculate(){
+		Object.keys(this.state).forEach(clientID=>{
+			this.state[clientID].forEach(robot=>{
+				robot.step++;
+			})
+		});
+	}
+
+	private stopSimulation(){
+		clearInterval(this.iteration);
+	}
+
+	public getCurrentLock(): boolean{
+		return this.lock;
 	}
 
 	public lockRoom():void{
@@ -46,8 +109,21 @@ export class Room<T> extends EventEmitter{
 		this.lock = false;
 	}
 
-	public send(client:Client, data:any): void{
-		client.send(data);
+	// public send(client:Client, data:any): void{
+	// 	let msg = msgpack.encode([Sign.ROOM_DATA,data]);
+	// 	client.send(msg,this.msgOption);
+	// }
+
+	private sendState(client:Client): void{
+
+	}
+
+	public broadcast(data:any){
+		let msg;
+		this.clients.forEach((client) => {
+			msg = msgpack.encode([Sign.ROOM_DATA,data[client.id],'data from server']);
+			client.send(msg,this.msgOption)
+		});
 	}
 
 	public onMessage(client:Client, data:any): void{
@@ -56,35 +132,29 @@ export class Room<T> extends EventEmitter{
 	}
 
 	public onJoin(client:Client, options:any): void{
-		// this.state
+		// send waiting for action to client
+		let msg = msgpack.encode([Sign.CLIENT_WAIT,0,`Wait until room ${this.roomID} start`]);
+		client.send(msg,this.msgOption);
 	}
 
 	public onLeave(client:Client): void{
-		// this.state.message
+		// do noting
 	}
 
 	public onDispose(){
 		console.log('Dispose room');
 	}
 
-
 	private _onJoin(client:Client, options?:any): void{
 		this.clients.push(client);
-
-		if(this.state){
-			// this.sendState(client);
-		}
-		if(this.onJoin){
-			this.onJoin(client,options);
-		}
+		this.onJoin(client,options);
 	}
 	private _onLeave (client: Client, isDisconnect: boolean = false): void {
 		this.clients.splice(this.clients.indexOf(client),1);
-		if (this.onLeave) this.onLeave(client);
+		this.onLeave(client);
 		this.emit('leave', client, isDisconnect);
-
 		if (!isDisconnect) {
-			// client.send('disconnect');
+			client.send(msgpack.encode([Sign.ROOM_LEAVE,this.roomID]),this.msgOption);			
 		}
 	}
 

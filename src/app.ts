@@ -4,6 +4,8 @@ import * as bodyParser from 'body-parser';
 // import * as WebSocket from "ws";
 import * as uid from "shortid";
 import { SV } from './index';
+import { Room } from './Room';
+import * as util from 'util';
 
 class App {
 	public express: express.Application;
@@ -28,31 +30,55 @@ class App {
 			res.sendFile('watch.html');
 		});
 
-		router.get('/roomList',(req,res)=>{		
+		router.get('/room',(req,res)=>{
 			res.json(SV.getRoomList())
+		});
+
+		router.get('/room/:roomID',(req,res)=>{
+			let roomInfo:Room<any> = SV.getRoomInfo(req.params.roomID);
+			res.send(				
+					util.inspect(
+						{
+							clientAmount: roomInfo.getClientAmount(),
+							options: roomInfo.options
+						}
+					
+						,false,null
+					)
+			);
 		});
 
 		router.post('/create',(req,res)=>{
 			var roomName = req.body.roomName || 'Untitled';
 			var options = {
-				max_player_number: req.body.max_player_number || 10,
-				player_robot_number: req.body.player_robot_number || 1,
+				maxPlayer: req.body.maxPlayer || 10,
+				robotPerPlayer: req.body.robotPerPlayer || 1,
 			}
 			var roomData = SV.createRoom(roomName,options);
 			res.json(roomData);
 		});
 
-		router.get('/info/:roomID',(req,res)=>{
-			res.json(SV.getRoomInfo(req.params.roomID));
-		});
 		router.get('/start/:roomID',(req,res)=>{
-
+			SV.startRoom(req.params.roomID,(err,pass)=>{
+				if(pass){
+					res.json({'success':true});
+				}else{
+					res.json({'success':false,'error':err});
+				}
+			});
 		});
 		router.get('/stop/:roomID',(req,res)=>{
-
+			SV.stopRoom(req.params.roomID,(err,pass)=>{
+				if(pass){
+					res.json({'success':true});
+				}else{
+					res.json({'success':false,'error':err});
+				}
+			});
 		});
 		router.delete('/:roomID',(req,res)=>{
-
+			SV.deleteRoom(req.params.roomID);
+			res.json({'success':true});
 		});
 		this.express.use('/', router);
 	}

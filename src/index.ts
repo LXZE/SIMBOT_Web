@@ -10,5 +10,5 @@ const httpServer = http.createServer(App);
 const botServer = new Server({ server: httpServer });
 httpServer.listen(port);
 console.log(`Server listening on http://localhost:${port}`);
-export type Client = WebSocket & { id: string, name:string, token:string };
+export type Client = WebSocket & { id: string, data: any };
 export let SV = botServer;
