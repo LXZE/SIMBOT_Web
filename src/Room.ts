@@ -3,6 +3,7 @@ import { Client } from "./index";
 import * as msgpack from "msgpack-lite";
 import { Sign } from "./Sign";
 import { Robot } from './Robot';
+import * as util from 'util';
 
 export class Room<Type> extends EventEmitter{
 	public roomID: number;
@@ -68,18 +69,6 @@ export class Room<Type> extends EventEmitter{
 	}
 
 	private runSimulation(){
-		// TODO : broadcast -> gathering -> calculate then loop until stop
-
-		// old
-		// if(this.iteration) clearInterval(this.iteration);
-		// this.iteration = setInterval(()=>{
-		// 	this.calculate();
-		// 	this.broadcast(this.state);
-		// 	this.step++;
-		// 	console.log(`${this.roomName}[${this.roomID}] step = `,this.step);
-		// },1000);
-
-		// new
 		this.broadcast(this.state);
 		this.on(`trigger_${this.roomID}`,(gatherData)=>{
 			console.log(gatherData)
@@ -88,7 +77,6 @@ export class Room<Type> extends EventEmitter{
 			this.gathered = {};
 			this.broadcast(this.state);
 		});
-
 	}
 
 	private calculate(){
@@ -101,7 +89,6 @@ export class Room<Type> extends EventEmitter{
 	}
 
 	private stopSimulation(){
-		// clearInterval(this.iteration);
 		this.removeAllListeners(`trigger_${this.roomID}`);
 		this.step = 0;
 		this.state = {};
