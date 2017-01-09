@@ -10,6 +10,7 @@ export class Robot{
 
 	protected x:number;
 	protected y:number;
+	protected radius:number;
 	protected direction:number;
 	protected collision:boolean;
 
@@ -23,8 +24,17 @@ export class Robot{
 		this.ownerID = ownerData.ownerID;
 		this.ownerName = ownerData.ownerName;
 		this.matchController = matchController;
+		this.radius = options.radius || 10;
 		this.x = options.x || Math.random()*1024;
 		this.y = options.y || Math.random()*768;
+		//check robot position validity
+		while(checkCollision(this.x,this.y))
+		{
+			this.x = Math.random()*1024;
+			this.y = Math.random()*768;
+		}
+
+
 		this.direction = options.direction || Math.random()*360;
 		this.collision = false;
 
@@ -33,11 +43,13 @@ export class Robot{
 		this.options = options;
 	}
 
+	//	this method might be unnecessary
 	private checkSensor(x:number,y:number):boolean{
 		// check sensor if too near to object or not
 		return false;
 	}
 
+	// TODO: complete this method
 	// public getSensorsValue():RobotSensors{
 	// 	//old scanSensor
 	// 	//old smell
@@ -45,7 +57,7 @@ export class Robot{
 
 	private checkCollision(x:number,y:number):boolean{
 		// check if robot collide with obstacle at given position
-		return false;
+		return !matchController.robotPlacementAllowed(x,y,this.radius);
 	}
 
 	public move(range:number){
@@ -54,11 +66,13 @@ export class Robot{
 		let collide = this.checkCollision(new_x,new_y);
 		if(!collide)
 		{
-			// this.x = new_x;
-			// this.y = new_y;
 			this.setPosition(new_x,new_y);
+			this.collision = false;
 		}
-		//TODO: set collision attribute here
+		else
+		{
+			this.collision = true;
+		}
 	}
 
 	public turn(degree:number){
