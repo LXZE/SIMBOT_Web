@@ -9,14 +9,14 @@ interface Obstacle{
 
 export class Map{
 
-	protected _foodPosition:Point;
+	protected foodPosition:Point;
 	protected obstacle:Obstacle[];
 
-	public get foodPosition() : Point {
-		return _foodPosition;
+	public getFoodPosition() : Point {
+		return foodPosition;
 	}
-	public set foodPosition(foodPosition : Point) {
-		this._foodPosition = foodPosition;
+	public setFoodPosition(foodPosition : Point) {
+		this.foodPosition = foodPosition;
 	}
 	//public newFoodPosition():void;
 
@@ -31,7 +31,6 @@ export class Map{
 			let obs = {x1:x1[i],x2:x2[i],y1:y1[i],y2:y2[i]};
 			obstacle.push(obs);
 		}
-		this.foodPosition = {x:720,y:210};
-
+		this.setFoodPosition({x:720,y:210});
 	}
 }

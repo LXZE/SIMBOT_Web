@@ -28,7 +28,7 @@ export class MatchController{
 	constructor(room:Room,robots:Robot[],options:any = {}){
 		this.room = room;
 		this.robotList = robots;
-		//TODO: instance a map
+		this.map = new Map();
 	}
 	private squareCollided(A:Square, B:Square,countTouchAsCollide:boolean=false):boolean{
 		if(countTouchAsCollide)
