@@ -83,7 +83,4 @@ export class Robot{
 	public getDirection(): number{
 		return this.direction;
 	}
-
-	publ
-
 }

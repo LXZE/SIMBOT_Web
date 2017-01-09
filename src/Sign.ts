@@ -15,4 +15,9 @@ export enum Sign {
 	ROOM_JOIN = 13,
 	ROOM_LEAVE = 14,
 
+
+
+	DISCRETE_MOTION = 50,
+	CONTINUE_MOTION = 51,
+
 }

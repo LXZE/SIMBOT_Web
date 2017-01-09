@@ -1,5 +1,6 @@
 import { Room } from './Room';
 import { Client } from './index';
+import { Sign } from './Sign';
 import * as uid from 'shortid';
 
 export class Handler{
@@ -68,13 +69,14 @@ export class Handler{
 		roomOptions.roomID = this.roomCount++;
 		roomOptions.roomName = roomName;
 		roomOptions.roomToken = uid.generate();
+		roomOptions.movementType = options.movementType || Sign.CONTINUE_MOTION;
 
 		room = new Room(roomOptions);
 		this.roomList[roomOptions.roomID] = room;
 		return room;
 	}
 
-	public delete(roomID:number): void{
+	public delete(roomID:number,callback: (err:any,pass:boolean)=>any = ()=>{}): void{
 		this.disposeRoom(roomID,this.roomList[roomID]);
 	}
 

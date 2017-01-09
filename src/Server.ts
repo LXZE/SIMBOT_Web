@@ -49,7 +49,7 @@ export class Server extends EventEmitter{
 		}else{
 			throw new Error('Create room failed');
 		}
-		console.log(`Room ${room.roomID} created`);
+		console.log(`Room ${room.roomName}[${room.roomID}] created`);
 		return room;
 	}
 

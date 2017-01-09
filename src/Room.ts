@@ -10,9 +10,10 @@ export class Room<Type> extends EventEmitter{
 
 	protected clients: Client[] = [];
 	public options: any;
+	private movementType:number;
 
 	private state: { [clientID:string]:any[] } = {};
-	protected prevState: any;
+	private gathered:any = {};
 
 	protected iteration: NodeJS.Timer;
 	protected step:number = 0;
@@ -27,6 +28,7 @@ export class Room<Type> extends EventEmitter{
 		this.roomID = options.roomID;
 		this.roomName = options.roomName;
 		this.maxPlayer = options.maxPlayer;
+		this.movementType = options.movementType == Sign.DISCRETE_MOTION ? Sign.DISCRETE_MOTION : Sign.CONTINUE_MOTION;
 		this.options = options;
 		this.lock = false;
 
@@ -37,23 +39,16 @@ export class Room<Type> extends EventEmitter{
 	}
 
 	public requestJoin(): boolean{
-		return !this.lock || this.clients.length < this.maxPlayer;
-	}
-
-	public setState(newState){
-		this.prevState = this.state;
-		this.state = newState;
+		return !this.lock && this.clients.length < this.maxPlayer;
 	}
 
 	public start(){
 		if(this.lock){
-			console.log(`Room ${this.roomID} start Simulation`);
-			console.log(this.options);
+			console.log(`Room ${this.roomName}[${this.roomID}] start Simulation`);
 			this.clients.forEach(client => {
 				this.state[client.id] = [];
 				let n = this.options.robotPerPlayer ;
 				while(n--){
-					// TODO : Create new robot instance
 					let newRobot = new Robot({
 						ownerID:client.id,
 						ownerName:client.data.name});
@@ -68,19 +63,32 @@ export class Room<Type> extends EventEmitter{
 	}
 
 	public stop(){
-		console.log(`Room ${this.roomID} stop Simulation`);
+		console.log(`Room ${this.roomName}[${this.roomID}] stop Simulation`);
 		this.stopSimulation();
 	}
 
 	private runSimulation(){
-		// TODO : RUN simulation in each iteration
-		if(this.iteration) clearInterval(this.iteration);
-		this.iteration = setInterval(()=>{
+		// TODO : broadcast -> gathering -> calculate then loop until stop
+
+		// old
+		// if(this.iteration) clearInterval(this.iteration);
+		// this.iteration = setInterval(()=>{
+		// 	this.calculate();
+		// 	this.broadcast(this.state);
+		// 	this.step++;
+		// 	console.log(`${this.roomName}[${this.roomID}] step = `,this.step);
+		// },1000);
+
+		// new
+		this.broadcast(this.state);
+		this.on(`trigger_${this.roomID}`,(gatherData)=>{
+			console.log(gatherData)
 			this.calculate();
+			this.step+=1;
+			this.gathered = {};
 			this.broadcast(this.state);
-			this.step++;
-			console.log('step = ',this.step);
-		},1000);
+		});
+
 	}
 
 	private calculate(){
@@ -89,10 +97,14 @@ export class Room<Type> extends EventEmitter{
 				robot.step++;
 			})
 		});
+		console.log(`${this.roomName}[${this.roomID}] step = `,this.step);
 	}
 
 	private stopSimulation(){
-		clearInterval(this.iteration);
+		// clearInterval(this.iteration);
+		this.removeAllListeners(`trigger_${this.roomID}`);
+		this.step = 0;
+		this.state = {};
 	}
 
 	public getCurrentLock(): boolean{
@@ -109,13 +121,14 @@ export class Room<Type> extends EventEmitter{
 		this.lock = false;
 	}
 
-	// public send(client:Client, data:any): void{
-	// 	let msg = msgpack.encode([Sign.ROOM_DATA,data]);
-	// 	client.send(msg,this.msgOption);
-	// }
-
-	private sendState(client:Client): void{
-
+	public gathering(client:Client,data:any){
+		if(data.step == this.step){
+			this.gathered[client.id] = data;
+			if(Object.keys(this.gathered).length == this.clients.length){
+				console.log(`step ${this.step} trigerred`);
+				this.emit(`trigger_${this.roomID}`,this.gathered);
+			}
+		}
 	}
 
 	public broadcast(data:any){
@@ -126,13 +139,15 @@ export class Room<Type> extends EventEmitter{
 		});
 	}
 
-	public onMessage(client:Client, data:any): void{
-		// this.state.message.push(data);
-		console.log(`At ${this.roomName}: ${client.id} -> ${data}`);
+	public onMessage(client:Client,message:any){
+		let data = msgpack.decode(message);
+		if(data[0] == Sign.CLIENT_DATA){
+			console.log(`${this.roomName}[${this.roomID}] get data from user ${client.data.name}[${client.id}] `,data[1]);
+			this.gathering(client,data[1])
+		}
 	}
 
 	public onJoin(client:Client, options:any): void{
-		// send waiting for action to client
 		let msg = msgpack.encode([Sign.CLIENT_WAIT,0,`Wait until room ${this.roomID} start`]);
 		client.send(msg,this.msgOption);
 	}
@@ -146,6 +161,7 @@ export class Room<Type> extends EventEmitter{
 	}
 
 	private _onJoin(client:Client, options?:any): void{
+		client.on('message',this.onMessage.bind(this,client));
 		this.clients.push(client);
 		this.onJoin(client,options);
 	}
