@@ -70,12 +70,29 @@ class App {
 				}
 			});
 		});
+		router.get('/pause/:roomID',(req,res)=>{
+			SV.pauseRoom(req.params.roomID,(err,pass)=>{
+				if(pass){
+					res.json({'success':true});
+				}else{
+					res.json({'success':false,'error':err});
+				}
+			});
+		});
+		router.get('/resume/:roomID',(req,res)=>{
+			SV.resumeRoom(req.params.roomID,(err,pass)=>{
+				if(pass){
+					res.json({'success':true});
+				}else{
+					res.json({'success':false,'error':err});
+				}
+			});
+		});
 		router.delete('/:roomID',(req,res)=>{
 			SV.deleteRoom(req.params.roomID);
 			res.json({'success':true});
 		});
 		this.express.use('/', router);
 	}
-
 }
 export default new App().express;

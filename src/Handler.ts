@@ -17,12 +17,12 @@ export class Handler{
 		if(!room){
 			callback('room not found',false);
 		}
-		if(!room.getCurrentLock()){
+		if(!room.getCurrentLock() && room.getCurrentStatus() == Sign.ROOM_STOP){
 			room.lockRoom();
 			room.start();
 			callback(null,true);
 		}else{
-			callback('room locked',false);
+			callback('room already started',false);
 		}
 	}
 
@@ -31,12 +31,38 @@ export class Handler{
 		if(!room){
 			callback('room not found',false);
 		}
-		if(room.getCurrentLock()){
+		if(room.getCurrentLock() && room.getCurrentStatus() !== Sign.ROOM_STOP){
 			room.stop();
 			room.unlockRoom();
 			callback(null,true);
 		}else{
-			callback('room isnt locked',false);
+			callback('room already stop',false);
+		}
+	}
+
+	public pauseRoom(roomID:number,callback: (err:any,pass:boolean)=>any){
+		let room = this.roomList[roomID];
+		if(!room){
+			callback('room not found',false);
+		}
+		if(room.getCurrentLock() && room.getCurrentStatus() !== Sign.ROOM_PAUSE){
+			room.pause();
+			callback(null,true);
+		}else{
+			callback('room is paused',false);
+		}
+	}
+
+	public resumeRoom(roomID:number, callback: (err:any,pass:boolean)=>any){
+		let room = this.roomList[roomID];
+		if(!room){
+			callback('room not found',false);
+		}
+		if(room.getCurrentLock() && room.getCurrentStatus() !== Sign.ROOM_RUN){
+			room.resume();
+			callback(null,true);
+		}else{
+			callback('room is running',false);
 		}
 	}
 

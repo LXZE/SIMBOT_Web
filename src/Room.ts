@@ -20,6 +20,7 @@ export class Room<Type> extends EventEmitter{
 	protected step:number = 0;
 	public maxPlayer: number;
 	protected lock: boolean;
+	protected status: number;
 
 	private msgOption:{} = {binary:true};
 
@@ -32,7 +33,7 @@ export class Room<Type> extends EventEmitter{
 		this.movementType = options.movementType == Sign.DISCRETE_MOTION ? Sign.DISCRETE_MOTION : Sign.CONTINUE_MOTION;
 		this.options = options;
 		this.lock = false;
-
+		this.status = Sign.ROOM_STOP;
 	}
 
 	public getClientAmount(): number{
@@ -40,11 +41,11 @@ export class Room<Type> extends EventEmitter{
 	}
 
 	public requestJoin(): boolean{
-		return !this.lock && this.clients.length < this.maxPlayer;
+		return !this.lock && this.clients.length < this.maxPlayer && this.status == Sign.ROOM_STOP;
 	}
 
 	public start(){
-		if(this.lock){
+		if(this.lock && this.status == Sign.ROOM_STOP){
 			console.log(`Room ${this.roomName}[${this.roomID}] start Simulation`);
 			this.clients.forEach(client => {
 				this.state[client.id] = [];
@@ -59,13 +60,27 @@ export class Room<Type> extends EventEmitter{
 					})
 				}
 			});
+			this.status = Sign.ROOM_RUN;
 			this.runSimulation();
 		}
+	}
+
+	public pause(){
+		console.log(`Room ${this.roomName}[${this.roomID}] pause Simulation`);
+		this.removeAllListeners(`trigger_${this.roomID}`);
+		this.status = Sign.ROOM_PAUSE;
+	}
+
+	public resume(){
+		console.log(`Room ${this.roomName}[${this.roomID}] resume Simulation`);
+		this.runSimulation();
+		this.status = Sign.ROOM_RUN;
 	}
 
 	public stop(){
 		console.log(`Room ${this.roomName}[${this.roomID}] stop Simulation`);
 		this.stopSimulation();
+		this.status = Sign.ROOM_STOP;
 	}
 
 	private runSimulation(){
@@ -96,6 +111,10 @@ export class Room<Type> extends EventEmitter{
 
 	public getCurrentLock(): boolean{
 		return this.lock;
+	}
+
+	public getCurrentStatus(): number{
+		return this.status;
 	}
 
 	public lockRoom():void{
