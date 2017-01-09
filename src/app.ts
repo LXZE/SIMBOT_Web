@@ -36,23 +36,17 @@ class App {
 
 		router.get('/room/:roomID',(req,res)=>{
 			let roomInfo:Room<any> = SV.getRoomInfo(req.params.roomID);
-			res.send(				
-					util.inspect(
-						{
-							clientAmount: roomInfo.getClientAmount(),
-							options: roomInfo.options
-						}
-					
-						,false,null
-					)
-			);
+			if(roomInfo)
+				res.json({clientAmount: roomInfo.getClientAmount(),options: roomInfo.options,lock: roomInfo.getCurrentLock()});
+			else
+				res.status(404).send(`Room ${req.params.roomID} not found`)
 		});
 
 		router.post('/create',(req,res)=>{
 			var roomName = req.body.roomName || 'Untitled';
 			var options = {
 				maxPlayer: req.body.maxPlayer || 10,
-				robotPerPlayer: req.body.robotPerPlayer || 1,
+				robotPerPlayer: req.body.robotPerPlayer || 2,
 			}
 			var roomData = SV.createRoom(roomName,options);
 			res.json(roomData);
