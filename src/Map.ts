@@ -1,6 +1,6 @@
 import { Point } from './matchController';
 
-interface Obstacle{
+export interface Obstacle{
 	x1:number,
 	x2?:number,
 	y1:number,
@@ -13,7 +13,7 @@ export class Map{
 	protected obstacle:Obstacle[];
 
 	public getFoodPosition() : Point {
-		return foodPosition;
+		return this.foodPosition;
 	}
 	public setFoodPosition(foodPosition : Point) {
 		this.foodPosition = foodPosition;
@@ -29,7 +29,7 @@ export class Map{
 		for(let i=0;i<9;i++)
 		{
 			let obs = {x1:x1[i],x2:x2[i],y1:y1[i],y2:y2[i]};
-			obstacle.push(obs);
+			this.obstacle.push(obs);
 		}
 		this.setFoodPosition({x:720,y:210});
 	}

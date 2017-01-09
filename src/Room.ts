@@ -5,6 +5,8 @@ import { Sign } from "./Sign";
 import { Robot } from './Robot';
 import * as util from 'util';
 
+import { MatchController } from './MatchController';
+
 export class Room<Type> extends EventEmitter{
 	public roomID: number;
 	public roomName: string;
@@ -23,6 +25,8 @@ export class Room<Type> extends EventEmitter{
 	protected status: number;
 
 	private msgOption:{} = {binary:true};
+
+	private matchCTRL:MatchController;
 
 	constructor(options: any = {}){
 		super();
@@ -47,19 +51,26 @@ export class Room<Type> extends EventEmitter{
 	public start(){
 		if(this.lock && this.status == Sign.ROOM_STOP){
 			console.log(`Room ${this.roomName}[${this.roomID}] start Simulation`);
+			this.matchCTRL = new MatchController(this);
+
 			this.clients.forEach(client => {
 				this.state[client.id] = [];
 				let n = this.options.robotPerPlayer ;
 				while(n--){
+
 					let newRobot = new Robot({
 						ownerID:client.id,
-						ownerName:client.data.name});
-					this.state[client.id].push({
-						step:0,
-						robot:newRobot,
-					})
+						ownerName:client.data.name},this.matchCTRL);
+					this.matchCTRL.placeRobot(newRobot);
+
+					// this.state[client.id].push({
+					// 	step:0,
+					// 	robot:newRobot,
+					// })
 				}
 			});
+
+
 			this.status = Sign.ROOM_RUN;
 			this.runSimulation();
 		}

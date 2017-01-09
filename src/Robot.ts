@@ -38,10 +38,10 @@ export class Robot{
 		return false;
 	}
 
-	public getSensorsValue():RobotSensors{
-		//old scanSensor
-		//old smell
-	}
+	// public getSensorsValue():RobotSensors{
+	// 	//old scanSensor
+	// 	//old smell
+	// }
 
 	private checkCollision(x:number,y:number):boolean{
 		// check if robot collide with obstacle at given position
@@ -49,35 +49,36 @@ export class Robot{
 	}
 
 	public move(range:number){
-		new_x = this.x+range*Math.cos(this.direction*Math.PI/180);
-		new_y:this.y+range*Math.sin(this.direction*Math.PI/180);
-		let collide = checkCollision;
+		let new_x = this.x+range*Math.cos(this.direction*Math.PI/180);
+		let new_y = this.y+range*Math.sin(this.direction*Math.PI/180);
+		let collide = this.checkCollision(new_x,new_y);
 		if(!collide)
 		{
-			this.x = new_x;
-			this.y = new_y;
+			// this.x = new_x;
+			// this.y = new_y;
+			this.setPosition(new_x,new_y);
 		}
 		//TODO: set collision attribute here
 	}
 
 	public turn(degree:number){
-		setDirection(this.direction+degree);
+		this.setDirection(this.direction+degree);
 	}
 
 	public moveForward(){
-		move(5);
+		this.move(5);
 	}
 
 	public moveBackward(){
-		move(-5);
+		this.move(-5);
 	}
 
 	public turnRight(){
-		setDirection(this.direction+5);
+		this.setDirection(this.direction+5);
 	}
 
 	public turnLeft(){
-		setDirection(this.direction-5);
+		this.setDirection(this.direction-5);
 	}
 
 	public setPosition(x:number, y:number){
