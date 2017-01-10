@@ -50,9 +50,37 @@ export class MatchController{
 	public getRobotData():Robot[]{
 		return this.robotList;
 	}
+	public distSensorScan(start:Point,end:Point,length:number):SensorInfo{
+		let Line = {a:start,b:end};
+		let distSeen = [];
+		//map boundary check
+		let mapSize = this.map.getMapSize();
+		let mapRectangle = {x:0,y:0,x2:mapSize.x,y2:mapSize.y};
+		distSeen.add(this.lineRectangleIntersect(line,length,mapRectangle));
+		//obstacle check
+		let obs = this.map.getObstacles();
+		for (let ob of obs) {
+			distSeen.add(this.lineRectangleIntersect(line,ob));
+		}
+		//other robot check - not implemented
+
+		//keep lowest value
+		let dist = distSeen.filter(function(x){
+			return x.detected;
+		}).map(function(x){
+			return x.distance;
+		}).reduce(function(x,y){
+			return (x<y)?x:y;
+		},length);
+		return dist;
+	}
+	public angleBetweenPoint(a:Point,b:Point):number{
+		
+	}
 
 	public robotPlacementAllowed(x:number,y:number,radius:number):boolean{
 		let robotCircle = {x:x,y:y,radius:radius};
+		//map boundary check
 		let mapSize = this.map.getMapSize();
 		let mapRectangle = {x:0,y:0,x2:mapSize.x,y2:mapSize.y};
 		if(!this.circleInRectangle(robotCircle,mapRectangle))
@@ -61,6 +89,7 @@ export class MatchController{
 		}
 		else
 		{
+			//obstacle check
 			let obs = this.map.getObstacles();
 			for (let ob of obs)
 			{
@@ -68,22 +97,64 @@ export class MatchController{
 					return false;
 				}
 			}
+			//other robot check - not implemented
 			return true;
 		}
+	}
+
+	private getLinesFromRectangle(A:Rectangle):Lines[]{
+		return [{x1:A.x, y1:A.y, x2:A.x, y2:A.y2},	{x1:A.x, y1:A.y2, x2:A.x2, y2:A.y2}, {x1:A.x2, y1:A.y2, x2:A.x2, y2:A.y}, {x1:A.x2, y1:A.y, x2:A.x, y2:A.y} ];
+	}
+	private distBetweenPoint(A:Point,B:Point):number{
+		let dx = A.x-B.x;
+		let dy = A.y-B.y;
+		return Math.sqrt(dx*dx+dy*dy);
+	}
+	private getLineIntersect(A:Line,B:Line):any{
+		let x1 = A.a.x;
+		let x2 = A.b.x;
+		let x3 = B.a.x;
+		let x4 = B.b.x;
+		let y1 = A.a.y;
+		let y2 = A.b.y;
+		let y3 = B.a.y;
+		let y4 = B.b.y;
+		let denominator = ((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
+		if(denominator==0)
+		{
+			//parallel or coincident
+			//detect parallel line that is not horizontal or vertical may be tricky, so this function still not support it yet
+			return 0;
+		}
+		let detPtA = (x1*y2-y1*x2);
+		let detPtB = (x3*y4-y3*x4);
+		let px = (detPtA*(x3-x4)-(x1-x2)*detPtB)/denominator;
+		let py = (detPtA*(y3-y4)-(y1-y2)*detPtB)/denominator;
+		return {x:px,y:py};
+
+	}
+	private lineRectangleIntersect(a:Line,l:number,b:Rectangle):SensorInfo{
+		let bLines = this.getLinesFromRectangle(b);
+		for (let line of bLines){
+			let crossPoint = getLineIntersect(a,line);
+			if(crossPoint!=0)
+			{
+				if(this.pointOnRectangle(crossPoint,b))
+				{
+					let dist = this.distBetweenPoint(crossPoint,a.a);
+					if(dist <= l){
+						return {detected:true,distance = dist};
+					}
+				}
+			}
+		}
+		return {detected:false};
 	}
 	private circleInRectangle(A:Circle, B:Rectangle):boolean{
 		return (A.x-A.radius>=B.x) && (A.y-A.radius>=B.y) && (A.x+A.radius<=B.x2) && (A.y+A.radius<=B.y2);
 	}
 	private pointOnRectangle(A:Point, B:Rectangle):boolean{
 		return (A.x>=B.x) && (A.y>=B.y) && (A.x<=B.x2) && (A.y<=B.y2);
-	}
-	private lineRectangleIntersect(A:Line,B:Rectangle):SensorInfo{
-		if((A.a.x<B.x&&A.b.x<B.x) || (A.a.x>B.x2&&A.b.x>B.x2) || (A.a.y<B.y&&A.b.y<B.y) || (A.a.y>B.y2&&A.b.y>B.y2)){
-			return {detected:false};
-		}
-		//TODO : write this function to complete sensor scanning
-		//think of it as hit-scan projectile
-
 	}
 	private circleRectangleCollided(A:Circle, B:Rectangle, countTouchAsCollide:boolean=false):boolean{
 		//check circle center in rectangle
@@ -92,7 +163,7 @@ export class MatchController{
 		}
 		else{
 			//check if 4 side of regtangle intersect with circle
-			let lines = [{x1:B.x, y1:B.y, x2:B.x, y2:B.y2},	{x1:B.x, y1:B.y2, x2:B.x2, y2:B.y2}, {x1:B.x2, y1:B.y2, x2:B.x2, y2:B.y}, {x1:B.x2, y1:B.y, x2:B.x, y2:B.y} ];
+			let lines = this.getLinesFromRectangle(B);
 			for (let line of lines) {
 				let x1 = line.x1;
 				let x2 = line.x2;
@@ -128,9 +199,7 @@ export class MatchController{
 		
 	}
 	private circleCollided(A:Circle, B:Circle,countTouchAsCollide:boolean=false):boolean{
-		let dx = A.x-B.x;
-		let dy = A.y-B.y;
-		let dist = Math.sqrt(dx*dx+dy*dy);
+		let dist = distBetweenPoint(A,B);
 		if(countTouchAsCollide)
 			return dist<=(A.radius+B.radius);
 		else

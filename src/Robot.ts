@@ -7,19 +7,21 @@ interface RobotSensors{
 }
 
 export class Robot{
-	private matchController:MatchController;
 	public robotID:string;
+	public ownerID:string;
+	public ownerName:string;
+	private matchController:MatchController;
 
+	protected radius:number;
 	protected x:number;
 	protected y:number;
-	protected radius:number;
 	protected direction:number;
 	protected collision:boolean;
 
+	protected irRange:number = 255;
+
 	public target:number;
 	public IR:any[];
-	public ownerID:string;
-	public ownerName:string;
 	public options:any = {};
 
 	constructor(ownerData:{ownerID:string,ownerName:string},matchController:MatchController, options:any = {}){
@@ -31,32 +33,41 @@ export class Robot{
 		this.x = options.x || Math.random()*1024;
 		this.y = options.y || Math.random()*768;
 		//check robot position validity
-		while(this.checkCollision(this.x,this.y))
-		{
+		while(this.checkCollision(this.x,this.y)){
 			this.x = Math.random()*1024;
 			this.y = Math.random()*768;
 		}
-
 
 		this.direction = options.direction || Math.random()*360;
 		this.collision = false;
 
 		this.IR = [255,255,255,255,255,255,255,255];
+		this.target = 0;
 
 		this.options = options;
 	}
 
-	//	this method might be unnecessary
-	private checkSensor(x:number,y:number):boolean{
-		// check sensor if too near to object or not
-		return false;
+	private distSensorRead(angle:number):number{
+		let start = {x:this.x+(this.radius*Math.cos((angle)*Math.PI/180)),y:this.y+(this.radius*Math.cos((angle)*Math.PI/180))};
+		let end = {x:this.x+((this.radius+this.irRange)*Math.cos((angle)*Math.PI/180)),y:this.y+((this.radius+this.irRange)*Math.cos((angle)*Math.PI/180))};
+		let dist = this.matchController.distBetweenPoint(start,end);
+		let data = this.matchController.distSensorScan(start,end,dist);
+		if(data.detected){
+			return data.distance;
+		}
+		else{
+			return this.irRange;
+		}
 	}
 
 	// TODO: complete this method
-	// public getSensorsValue():RobotSensors{
-	// 	//old scanSensor
-	// 	//old smell
-	// }
+	public getSensorsValue():RobotSensors{
+		for (let i = 0; i < 8; i++) {
+			this.IR[i] = this.distSensorRead(this.direction+i*45);
+		}
+		//old smell
+		//this.matchController.angleBetweenPoint +- direction
+	}
 
 	private checkCollision(x:number,y:number):boolean{
 		// check if robot collide with obstacle at given position
@@ -67,13 +78,11 @@ export class Robot{
 		let new_x = this.x+range*Math.cos(this.direction*Math.PI/180);
 		let new_y = this.y+range*Math.sin(this.direction*Math.PI/180);
 		let collide = this.checkCollision(new_x,new_y);
-		if(!collide)
-		{
+		if(!collide){
 			this.setPosition(new_x,new_y);
 			this.collision = false;
 		}
-		else
-		{
+		else{
 			this.collision = true;
 		}
 	}
