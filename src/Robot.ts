@@ -1,4 +1,6 @@
 import { MatchController } from './matchController';
+import * as uid from 'shortid';
+
 interface RobotSensors{
 	smell:number,
 	IR:number[],
@@ -6,7 +8,7 @@ interface RobotSensors{
 
 export class Robot{
 	private matchController:MatchController;
-	public id:number;
+	public robotID:string;
 
 	protected x:number;
 	protected y:number;
@@ -21,6 +23,7 @@ export class Robot{
 	public options:any = {};
 
 	constructor(ownerData:{ownerID:string,ownerName:string},matchController:MatchController, options:any = {}){
+		this.robotID = uid.generate();
 		this.ownerID = ownerData.ownerID;
 		this.ownerName = ownerData.ownerName;
 		this.matchController = matchController;
@@ -28,7 +31,7 @@ export class Robot{
 		this.x = options.x || Math.random()*1024;
 		this.y = options.y || Math.random()*768;
 		//check robot position validity
-		while(checkCollision(this.x,this.y))
+		while(this.checkCollision(this.x,this.y))
 		{
 			this.x = Math.random()*1024;
 			this.y = Math.random()*768;
@@ -57,7 +60,7 @@ export class Robot{
 
 	private checkCollision(x:number,y:number):boolean{
 		// check if robot collide with obstacle at given position
-		return !matchController.robotPlacementAllowed(x,y,this.radius);
+		return !this.matchController.robotPlacementAllowed(x,y,this.radius);
 	}
 
 	public move(range:number){

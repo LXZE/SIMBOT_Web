@@ -87,6 +87,13 @@ export class Handler{
 		}
 		return room;
 	}
+	public clientLeave(client:Client){
+		console.log(`${client.data.name}[${client.id}] removed from server`)
+		Object.keys(this.roomList).forEach((roomKeys)=>{
+			let room = this.roomList[roomKeys];
+			room.onLeave(client);
+		})
+	}
 
 	public create(roomName:string,options?:any): Room<any> {
 		let room = null;

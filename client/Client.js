@@ -7,6 +7,7 @@ const msgpack = require("msgpack-lite");
 const Sign = require('../dist/Sign').Sign;
 const async = require('async');
 const request = require('supertest');
+const util = require('util');
 
 var clientName = 'LXZE';
 var clientID = '';
@@ -14,32 +15,74 @@ var clientToken = '';
 var roomID = '0';
 var msgOptions = {binary: true};
 var status = '';
+var execute = (robot)=>{ robot.move(Math.random()*10); };
+var cmdList = {};
+var cmdType = Sign.CONTINUE_MOTION;
 
-var connect = (url,name,token,room,cb = ()=>{})=>{
+var connect = (url,name,token,room,overrideExecute)=>{
 	ws = new WebSocket(`ws://${url}/`);
 	ev = new EventEmiiter();
 	clientName = name;
 	clientToken = token;
 	roomID = room;
+	execute = overrideExecute;
 	define();
-	cb(ws,ev);
 }
 
-var disconn = ()=>{
-	ws.close();
-}
-var encode = (data)=>{
-	return msgpack.encode(data);
+var run = (data)=>{
+	let i = 0;
+	let step;
+	data.forEach((elem)=>{
+		let robot = new Robot(i++,elem);
+		step = elem.step;
+		execute(robot);
+	})
+	send(cmdList,step);
 }
 
-var leaving = ()=>{
-	ws.send(encode([Sign.CLIENT_LEAVE,null,null]));
-	disconn();
+class Robot {
+	constructor(id,data){
+		this.id = id;
+		this.IR = data.robot.IR;
+		this.ownerID = data.robot.ownerID;
+		this.robotID = data.robot.robotID;
+		cmdList[data.robot.robotID] = {};
+	}
+	move(val){
+		cmdType = Sign.CONTINUE_MOTION;
+		if(!cmdList[this.robotID].hasOwnProperty('move')){
+			Object.assign(cmdList[this.robotID],{move:val});
+		}
+	}
+	turn(deg){
+		cmdType = Sign.CONTINUE_MOTION;
+		if(!cmdList[this.robotID].hasOwnProperty('turn')){
+			Object.assign(cmdList[this.robotID],{turn:deg});
+		}
+	}	
 }
 
-var move = (step,data)=>{
-	ws.send(msgpack.encode([Sign.CLIENT_DATA,{type:Sign.CONTINUE_MOTION, step:step, command:data
-		},`User ${clientName}[${clientID}] send data`]),msgOptions)
+var send = (data,step)=>{
+	console.log(`Step ${step} data = ${util.inspect(data)}`);
+	setTimeout(()=>{
+		try{
+			ws.send(msgpack.encode([Sign.CLIENT_DATA,{type:cmdType, step:step, command:data
+					},`User ${clientName}[${clientID}] send data`]),msgOptions)
+		}catch(e){}
+	},500);
+}
+
+var moveForward = ()=>{
+	cmdType = Sign.DISCRETE_MOTION;
+}
+var moveBackward = ()=>{
+	cmdType = Sign.DISCRETE_MOTION;
+}
+var turnLeft = ()=>{
+	cmdType = Sign.DISCRETE_MOTION;
+}
+var turnRight = ()=>{
+	cmdType = Sign.DISCRETE_MOTION;
 }
 
 var define = ()=>{
@@ -105,7 +148,9 @@ var define = ()=>{
 				disconn();
 				break;
 			case Sign.ROOM_DATA:
-				ev.emit('data',data[1]);
+				// ev.emit('data',data[1]);
+				status = 'running';
+				run(data[1]);
 				// console.log(data[1]);
 				break;
 			default:
@@ -127,6 +172,18 @@ var define = ()=>{
 }
 
 
+var disconn = ()=>{
+	ws.close();
+}
+var encode = (data)=>{
+	return msgpack.encode(data);
+}
+
+var leaving = ()=>{
+	ws.send(encode([Sign.CLIENT_LEAVE,null,null]));
+	disconn();
+}
+
 process.on('SIGINT', () => {
   console.log(`About to exit`);
   if(status == 'waiting')
@@ -137,5 +194,4 @@ process.on('SIGINT', () => {
 
 module.exports = {
 	connect:connect,
-	move:move,
 }

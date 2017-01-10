@@ -1,9 +1,10 @@
 import { EventEmitter } from "events";
 import { Client } from "./index";
-import * as msgpack from "msgpack-lite";
 import { Sign } from "./Sign";
 import { Robot } from './Robot';
 import * as util from 'util';
+import * as msgpack from "msgpack-lite";
+import * as _ from 'underscore';
 
 import { MatchController } from './MatchController';
 
@@ -57,20 +58,19 @@ export class Room<Type> extends EventEmitter{
 				this.state[client.id] = [];
 				let n = this.options.robotPerPlayer ;
 				while(n--){
-
 					let newRobot = new Robot({
 						ownerID:client.id,
 						ownerName:client.data.name},this.matchCTRL);
 					this.matchCTRL.placeRobot(newRobot);
-
-					// this.state[client.id].push({
-					// 	step:0,
-					// 	robot:newRobot,
-					// })
 				}
 			});
 
-
+			let robotData = this.matchCTRL.getRobotData();
+			let tmpRobot;
+			robotData.forEach((robot)=>{
+				tmpRobot = _.pick(robot,['IR','ownerID','robotID'])
+				this.state[robot.ownerID].push({step:this.step,robot:tmpRobot});
+			});
 			this.status = Sign.ROOM_RUN;
 			this.runSimulation();
 		}
@@ -152,7 +152,12 @@ export class Room<Type> extends EventEmitter{
 		let msg;
 		this.clients.forEach((client) => {
 			msg = msgpack.encode([Sign.ROOM_DATA,data[client.id],'data from server']);
-			client.send(msg,this.msgOption)
+			try{
+				client.send(msg,this.msgOption);
+			}catch(e){
+				console.log(`${client.data.name}[${client.id}] error occured`,e.message);
+				this.removeClient(client);
+			}
 		});
 	}
 
@@ -170,7 +175,7 @@ export class Room<Type> extends EventEmitter{
 	}
 
 	public onLeave(client:Client): void{
-		// do noting
+		this._onLeave(client,true)
 	}
 
 	public onDispose(){
@@ -183,12 +188,21 @@ export class Room<Type> extends EventEmitter{
 		this.onJoin(client,options);
 	}
 	private _onLeave (client: Client, isDisconnect: boolean = false): void {
-		this.clients.splice(this.clients.indexOf(client),1);
-		this.onLeave(client);
+		if(this.removeClient(client)){
+			delete this.state[client.id];
+		}
+		// this.onLeave(client);
 		this.emit('leave', client, isDisconnect);
 		if (!isDisconnect) {
 			client.send(msgpack.encode([Sign.ROOM_LEAVE,this.roomID]),this.msgOption);			
 		}
+	}
+	private removeClient(client:Client):boolean{
+		if(this.clients.indexOf(client) !== -1){
+			this.clients.splice(this.clients.indexOf(client),1);
+			return true;
+		}
+		return false;
 	}
 
 }

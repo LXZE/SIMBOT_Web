@@ -31,7 +31,7 @@ interface SensorInfo{
 
 export class MatchController{
 	private room:Room<any>;
-	private robotList:Robot[];
+	private robotList:Robot[] = [];
 	private map:Map;
 
 	constructor(room:Room<any>,options:any = {}){
@@ -47,23 +47,28 @@ export class MatchController{
 		return this.map.getFoodPosition();
 	}
 
+	public getRobotData():Robot[]{
+		return this.robotList;
+	}
+
 	public robotPlacementAllowed(x:number,y:number,radius:number):boolean{
 		let robotCircle = {x:x,y:y,radius:radius};
 		let mapSize = this.map.getMapSize();
 		let mapRectangle = {x:0,y:0,x2:mapSize.x,y2:mapSize.y};
-		if(!circleInRectangle(robotCircle,mapRectangle))
+		if(!this.circleInRectangle(robotCircle,mapRectangle))
 		{
 			return false;
 		}
 		else
 		{
-			let obs = this.map.getObstacles;
-			for (let ob in obs)
+			let obs = this.map.getObstacles();
+			for (let ob of obs)
 			{
-				if(circleRectangleCollided(robotCircle,ob)){
+				if(this.circleRectangleCollided(robotCircle,ob)){
 					return false;
 				}
 			}
+			return true;
 		}
 	}
 	private circleInRectangle(A:Circle, B:Rectangle):boolean{
@@ -73,8 +78,8 @@ export class MatchController{
 		return (A.x>=B.x) && (A.y>=B.y) && (A.x<=B.x2) && (A.y<=B.y2);
 	}
 	private lineRectangleIntersect(A:Line,B:Rectangle):SensorInfo{
-		if((A.x1<B.x&&A.x2<B.x) || (A.x1>B.x2&&A.x2>B.x2) || (A.y1<B.y&&A.y2<B.y) || (A.y>B.y2&&A.y2>B.y2)){
-			return false;
+		if((A.a.x<B.x&&A.b.x<B.x) || (A.a.x>B.x2&&A.b.x>B.x2) || (A.a.y<B.y&&A.b.y<B.y) || (A.a.y>B.y2&&A.b.y>B.y2)){
+			return {detected:false};
 		}
 		//TODO : write this function to complete sensor scanning
 		//think of it as hit-scan projectile
@@ -88,7 +93,7 @@ export class MatchController{
 		else{
 			//check if 4 side of regtangle intersect with circle
 			let lines = [{x1:B.x, y1:B.y, x2:B.x, y2:B.y2},	{x1:B.x, y1:B.y2, x2:B.x2, y2:B.y2}, {x1:B.x2, y1:B.y2, x2:B.x2, y2:B.y}, {x1:B.x2, y1:B.y, x2:B.x, y2:B.y} ];
-			for (let line in lines) {
+			for (let line of lines) {
 				let x1 = line.x1;
 				let x2 = line.x2;
 				let y1 = line.y1;

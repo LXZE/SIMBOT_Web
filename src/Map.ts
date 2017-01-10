@@ -4,7 +4,7 @@ export class Map{
 
 	protected size:Point;
 	protected foodPosition:Point;
-	protected obstacles:Rectangle[];
+	protected obstacles:Rectangle[] = [];
 
 	public getMapSize():Point {
 		return this.size;
@@ -21,7 +21,7 @@ export class Map{
 
 	constructor(options:any = {}){
 		//TODO: convert obstacle list to load from file
-		this.size = {x:740, y:400};
+		this.size = {x:800, y:400};
 		let x1 = [90,270,210,210,490,490,490,630,630];
 		let x2 = [140,370,340,340,540,540,540,660,660];
 		let y1 = [90,130,330,0,70,0,380,240,10];

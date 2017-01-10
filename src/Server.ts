@@ -157,8 +157,8 @@ export class Server extends EventEmitter{
 	private onDisconnect (client:Client) {
 		console.log(`Client ${client.data.name} disconnected`);
 		this.emit('disconnect', client);
+		this.handler.clientLeave(client);
 		delete this.clients[client.id];
-
 	}
 
 }
