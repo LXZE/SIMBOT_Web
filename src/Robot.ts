@@ -60,13 +60,12 @@ export class Robot{
 		}
 	}
 
-	// TODO: complete this method
 	public getSensorsValue():RobotSensors{
 		for (let i = 0; i < 8; i++) {
 			this.IR[i] = this.distSensorRead(this.direction+i*45);
 		}
-		//old smell
-		//this.matchController.angleBetweenPoint +- direction
+		this.target = (this.matchController.getAngleToFood({x:this.x,y:this.y})-this.direction+360)%360;
+		return {smell:this.target,IR:this.IR};
 	}
 
 	private checkCollision(x:number,y:number):boolean{

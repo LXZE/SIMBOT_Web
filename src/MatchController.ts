@@ -74,8 +74,10 @@ export class MatchController{
 		},length);
 		return dist;
 	}
-	public angleBetweenPoint(a:Point,b:Point):number{
-		
+	public getAngleToFood(a:Point):number{
+		let food = this.getFoodPosition();
+		return Math.atan2(food.y-a.y,food.x-a.x)*180/Math.PI;
+
 	}
 
 	public robotPlacementAllowed(x:number,y:number,radius:number):boolean{
