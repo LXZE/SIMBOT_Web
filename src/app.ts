@@ -6,6 +6,7 @@ import * as uid from "shortid";
 import { SV } from './index';
 import { Room } from './Room';
 import * as util from 'util';
+import * as njk from 'nunjucks';
 
 class App {
 	public express: express.Application;
@@ -19,11 +20,17 @@ class App {
 		this.express.use(bodyParser.json());
 		this.express.use(bodyParser.urlencoded({ extended: false }));
 		this.express.use(express.static('public'))
+		// this.express.use('view engine',)
+		njk.configure('views',{
+			autoescape:true,
+			express:this.express,
+		})
 	}
 	private routes(): void {
 		let router = express.Router();
 		router.get('/', (req, res, next) => {
-			res.sendFile('index.html');
+			// res.sendFile('index.html');
+			res.render('index.html',{message:'Hello world'});
 		});
 
 		router.get('/watch',(req,res)=>{
