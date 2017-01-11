@@ -1,7 +1,7 @@
 import { MatchController } from './matchController';
 import * as uid from 'shortid';
 
-interface RobotSensors{
+export interface RobotSensors{
 	smell:number,
 	IR:number[],
 }
@@ -50,8 +50,8 @@ export class Robot{
 	private distSensorRead(angle:number):number{
 		let start = {x:this.x+(this.radius*Math.cos((angle)*Math.PI/180)),y:this.y+(this.radius*Math.cos((angle)*Math.PI/180))};
 		let end = {x:this.x+((this.radius+this.irRange)*Math.cos((angle)*Math.PI/180)),y:this.y+((this.radius+this.irRange)*Math.cos((angle)*Math.PI/180))};
-		let dist = this.matchController.distBetweenPoint(start,end);
-		let data = this.matchController.distSensorScan(start,end,dist);
+		//let dist = this.matchController.distBetweenPoint(start,end);
+		let data = this.matchController.distSensorScan(start,end);
 		if(data.detected){
 			return data.distance;
 		}

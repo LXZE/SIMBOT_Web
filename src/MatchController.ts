@@ -24,7 +24,7 @@ interface Circle{
 	y:number,
 	radius: number,
 }
-interface SensorInfo{
+export interface SensorInfo{
 	detected:boolean,
 	distance?:number,
 }
@@ -50,17 +50,18 @@ export class MatchController{
 	public getRobotData():Robot[]{
 		return this.robotList;
 	}
-	public distSensorScan(start:Point,end:Point,length:number):SensorInfo{
-		let Line = {a:start,b:end};
+	public distSensorScan(start:Point,end:Point):SensorInfo{
+		let line = {a:start,b:end};
+		let length = this.lineLength(line)
 		let distSeen = [];
 		//map boundary check
 		let mapSize = this.map.getMapSize();
 		let mapRectangle = {x:0,y:0,x2:mapSize.x,y2:mapSize.y};
-		distSeen.add(this.lineRectangleIntersect(line,length,mapRectangle));
+		distSeen.push(this.lineRectangleIntersect(line,length,mapRectangle));
 		//obstacle check
 		let obs = this.map.getObstacles();
 		for (let ob of obs) {
-			distSeen.add(this.lineRectangleIntersect(line,ob));
+			distSeen.push(this.lineRectangleIntersect(line,length,ob));
 		}
 		//other robot check - not implemented
 
@@ -104,13 +105,17 @@ export class MatchController{
 		}
 	}
 
-	private getLinesFromRectangle(A:Rectangle):Lines[]{
-		return [{x1:A.x, y1:A.y, x2:A.x, y2:A.y2},	{x1:A.x, y1:A.y2, x2:A.x2, y2:A.y2}, {x1:A.x2, y1:A.y2, x2:A.x2, y2:A.y}, {x1:A.x2, y1:A.y, x2:A.x, y2:A.y} ];
+	private getLinesFromRectangle(A:Rectangle):Line[]{
+		// return [{x1:A.x, y1:A.y, x2:A.x, y2:A.y2},	{x1:A.x, y1:A.y2, x2:A.x2, y2:A.y2}, {x1:A.x2, y1:A.y2, x2:A.x2, y2:A.y}, {x1:A.x2, y1:A.y, x2:A.x, y2:A.y} ];
+		return [{a:{x:A.x,y:A.y},b:{x:A.x,y:A.y2}},{a:{x:A.x,y:A.y2},b:{x:A.x2,y:A.y2}},{a:{x:A.x2,y:A.y2},b:{x:A.x2,y:A.y}},{a:{x:A.x2,y:A.y},b:{x:A.x,y:A.y}}];
 	}
 	private distBetweenPoint(A:Point,B:Point):number{
 		let dx = A.x-B.x;
 		let dy = A.y-B.y;
 		return Math.sqrt(dx*dx+dy*dy);
+	}
+	private lineLength(A:Line):number{
+		return this.distBetweenPoint(A.a,A.b);
 	}
 	private getLineIntersect(A:Line,B:Line):any{
 		let x1 = A.a.x;
@@ -138,14 +143,14 @@ export class MatchController{
 	private lineRectangleIntersect(a:Line,l:number,b:Rectangle):SensorInfo{
 		let bLines = this.getLinesFromRectangle(b);
 		for (let line of bLines){
-			let crossPoint = getLineIntersect(a,line);
+			let crossPoint = this.getLineIntersect(a,line);
 			if(crossPoint!=0)
 			{
 				if(this.pointOnRectangle(crossPoint,b))
 				{
 					let dist = this.distBetweenPoint(crossPoint,a.a);
 					if(dist <= l){
-						return {detected:true,distance = dist};
+						return {detected:true,distance:dist};
 					}
 				}
 			}
@@ -167,12 +172,12 @@ export class MatchController{
 			//check if 4 side of regtangle intersect with circle
 			let lines = this.getLinesFromRectangle(B);
 			for (let line of lines) {
-				let x1 = line.x1;
-				let x2 = line.x2;
-				let y1 = line.y1;
-				let y2 = line.y2;
-				let dy = line.y2-line.y1;
-				let dx = line.x2-line.x1;
+				let x1 = line.a.x;
+				let x2 = line.b.x;
+				let y1 = line.a.y;
+				let y2 = line.b.y;
+				let dy = y2-y1;
+				let dx = x2-x1;
 				let x0 = A.x;
 				let y0 = A.y;
 				let dist = Math.abs(dy*x0-dx*y0+x2*y1-y2*x1)/Math.sqrt(dy*dy+dx*dx);
@@ -201,7 +206,7 @@ export class MatchController{
 		
 	}
 	private circleCollided(A:Circle, B:Circle,countTouchAsCollide:boolean=false):boolean{
-		let dist = distBetweenPoint(A,B);
+		let dist = this.distBetweenPoint(A,B);
 		if(countTouchAsCollide)
 			return dist<=(A.radius+B.radius);
 		else
