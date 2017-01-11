@@ -20,7 +20,6 @@ class App {
 		this.express.use(bodyParser.json());
 		this.express.use(bodyParser.urlencoded({ extended: false }));
 		this.express.use(express.static('public'))
-		// this.express.use('view engine',)
 		njk.configure('views',{
 			autoescape:true,
 			express:this.express,
