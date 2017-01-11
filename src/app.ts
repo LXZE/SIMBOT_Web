@@ -8,6 +8,52 @@ import { Room } from './Room';
 import * as util from 'util';
 import * as njk from 'nunjucks';
 
+// TODO : Delete all webpack component when in production
+import * as webpack from 'webpack';
+let webpackConfig = {
+  cache: true,
+  watch: true,
+  devtool: 'source-map',
+  entry: ['webpack/hot/dev-server',
+    'webpack-hot-middleware/client',
+    './front/main.js'],
+  output: {
+    path: '/public',
+    publicPath: 'http://localhost:8888/',
+    filename: 'app.js'
+  },
+
+  module: {
+    loaders: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules|vue\/dist|vue-router\/|vue-loader\/|vue-hot-reload-api\//,
+        loader: 'babel-loader'
+      },
+      {
+        test: /\.scss$/,
+        loaders: ['style', 'css', 'sass']
+      },
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader'
+      }
+    ]
+  },
+  plugins: [
+      new webpack.HotModuleReplacementPlugin(),
+      new webpack.NoErrorsPlugin()
+  ],
+  resolve: {
+    alias: {
+      'vue$': 'vue/dist/vue.common.js'
+    }
+  },
+};
+import * as webpackHotMiddleware from 'webpack-hot-middleware';
+import * as webpackDevMiddleware from 'webpack-dev-middleware';
+let compiler = webpack(webpackConfig);
+
 class App {
 	public express: express.Application;
 
@@ -19,21 +65,28 @@ class App {
 	private middleware(): void {
 		this.express.use(bodyParser.json());
 		this.express.use(bodyParser.urlencoded({ extended: false }));
-		this.express.use(express.static('public'))
+		this.express.use(express.static('public'));
 		njk.configure('views',{
 			autoescape:true,
 			express:this.express,
-		})
+		});
+
+		// TODO : Delete all webpack component when in production
+		this.express.use(webpackDevMiddleware(compiler,{
+    		publicPath: webpackConfig.output.publicPath,  stats: {colors: true}
+		}));
+		this.express.use(webpackHotMiddleware(compiler,{
+			log: console.log
+		}));
 	}
 	private routes(): void {
 		let router = express.Router();
 		router.get('/', (req, res, next) => {
-			// res.sendFile('index.html');
-			res.render('index.html',{message:'Hello world'});
+			res.render('index.html');
 		});
 
 		router.get('/watch',(req,res)=>{
-			res.sendFile('watch.html');
+			res.json({a:1});
 		});
 
 		router.get('/room',(req,res)=>{
