@@ -25,7 +25,7 @@ gulp.task("supervisor", function() {
     } );
 } );
 
-gulp.task('watch', ['scripts','supervisor'], () => {
+gulp.task('watch', ['scripts'], () => {
   gulp.watch('src/*.ts', ['scripts']);
 });
 

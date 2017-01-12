@@ -4,7 +4,7 @@
   "description": "Web based Robot Simulation",
   "main": "index.js",
   "scripts": {
-    "dev": "gulp scripts && supervisor -w dist,views dist/index.js",
+    "dev": "gulp watch & supervisor -w dist,views dist/index.js",
     "start": "gulp scripts & gulp webpack & gulp supervisor",
     "test": "mocha --require ts-node/register test/**Test.ts"
   },

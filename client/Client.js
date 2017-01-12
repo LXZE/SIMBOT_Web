@@ -67,7 +67,8 @@ var send = (data,step)=>{
 	setTimeout(()=>{
 		try{
 			ws.send(msgpack.encode([Sign.CLIENT_DATA,{type:cmdType, step:step, command:data
-					},`User ${clientName}[${clientID}] send data`]),msgOptions)
+					},`User ${clientName}[${clientID}] send data`]),msgOptions);
+			cmdList = {};
 		}catch(e){}
 	},500);
 }

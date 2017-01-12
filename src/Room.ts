@@ -56,9 +56,10 @@ export class Room<Type> extends EventEmitter{
 
 			this.clients.forEach(client => {
 				this.state[client.id] = [];
-				let n = this.options.robotPerPlayer ;
+				let n = this.options.robotPerPlayer;
+				let newRobot;
 				while(n--){
-					let newRobot = new Robot({
+					newRobot = new Robot({
 						ownerID:client.id,
 						ownerName:client.data.name},this.matchCTRL);
 					this.matchCTRL.placeRobot(newRobot);
@@ -118,6 +119,7 @@ export class Room<Type> extends EventEmitter{
 		this.removeAllListeners(`trigger_${this.roomID}`);
 		this.step = 0;
 		this.state = {};
+		this.matchCTRL.clearRobot();
 	}
 
 	public getCurrentLock(): boolean{

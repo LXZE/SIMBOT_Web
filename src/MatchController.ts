@@ -43,6 +43,10 @@ export class MatchController{
 		this.robotList.push(robot);
 	}
 
+	public clearRobot(){
+		this.robotList = [];
+	}
+
 	public getFoodPosition():Point{
 		return this.map.getFoodPosition();
 	}
