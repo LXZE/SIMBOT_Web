@@ -4,7 +4,7 @@
   "description": "Web based Robot Simulation",
   "main": "index.js",
   "scripts": {
-    "dev": "gulp watch",
+    "dev": "gulp scripts && supervisor -w dist,views dist/index.js",
     "start": "gulp scripts & gulp webpack & gulp supervisor",
     "test": "mocha --require ts-node/register test/**Test.ts"
   },
@@ -18,8 +18,8 @@
     "amqp": "^0.2.6",
     "babel-runtime": "^6.0.0",
     "body-parser": "^1.15.2",
+    "element-ui": "^1.1.3",
     "express": "^4.14.0",
-    "keen-ui": "^0.8.9",
     "msgpack-lite": "^0.1.26",
     "nunjucks": "^3.0.0",
     "shortid": "^2.2.6",

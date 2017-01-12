@@ -12,7 +12,7 @@ import * as njk from 'nunjucks';
 import * as webpack from 'webpack';
 let webpackConfig = {
   cache: true,
-  watch: true,
+  // watch: true,
   devtool: 'eval',
   entry: [
   	'webpack/hot/dev-server',
@@ -20,8 +20,8 @@ let webpackConfig = {
     './front/main.js'],
   output: {
     path: '/',
-    publicPath: 'http://localhost:8888',
-    filename: 'app/app.js'
+    publicPath: 'http://localhost:8888/app',
+    filename: 'app.js'
   },
 
   module: {
@@ -80,7 +80,8 @@ class App {
 
 		// TODO : Delete all webpack component when in production
 		this.express.use(webpackDevMiddleware(compiler,{
-    		publicPath: webpackConfig.output.publicPath,  stats: {colors: true}
+    		publicPath: webpackConfig.output.publicPath,  stats: {colors: true},
+    		noInfo: true, quiet: true
 		}));
 		this.express.use(webpackHotMiddleware(compiler,{
 			log: console.log
