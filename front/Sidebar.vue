@@ -1,16 +1,31 @@
 <template lang="pug">
 .sidenav
   ul
-    li: a(href='#') Create Room
+    li: a(@click='show.Modal = true') Create Room
+  #Modal
+    ui-modal(:show.sync='show.Modal',type=large header='Create Room')
+      form
+        input(type='text',placeholder='test')
+      div(slot=footer)
+        ui-button(@click='show.Modal = false') cancel
+        ui-button(color=primary) Create
+
 </template>
 <script>
 export default {
-  name: 'Sidebar'
+  name: 'Sidebar',
+  data () {
+    return {
+      show:{
+        Modal: false,
+      }
+    }
+  }
 }
 </script>
 
 
-<style lang="sass">
+<style lang="scss">
 .sidenav {
   height: 100%;
   width: 250px;
@@ -21,14 +36,11 @@ export default {
   background-color: #111;
   overflow-x: hidden;
   padding-top: 60px;
-
   ul li {
     text-align: center;
-    
-    a{
+    a {
       text-decoration: none;
       font-size: 25px;
-      
       color: #818181;
       display: block;
       transition: 0.3s

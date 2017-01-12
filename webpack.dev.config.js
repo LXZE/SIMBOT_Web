@@ -3,14 +3,14 @@ var webpack = require('webpack')
 module.exports = {
   cache: true,
   watch: true,
-  devtool: 'source-map',
+  devtool: 'eval',
   entry: [
   	'webpack/hot/dev-server',
     'webpack-hot-middleware/client',
     './front/main.js'],
   output: {
-    path: '/public/app',
-    publicPath: 'http://localhost:8888/',
+    path: '/public',
+    publicPath: 'http://localhost:8888/app',
     filename: 'app.js'
   },
 
@@ -27,7 +27,13 @@ module.exports = {
       },
       {
         test: /\.vue$/,
-        loader: 'vue-loader'
+        loader: 'vue-loader',
+        options: {
+          loaders: {
+            scss: 'vue-style-loader!css-loader!sass-loader',
+            sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax',
+          }
+        }
       }
     ]
   },

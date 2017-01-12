@@ -12,15 +12,7 @@ export default {
 	components: {
 		Sidebar,
 		Container
-	},
-	data() {
-		return {
-
-		}
-	},
-	computed:{
-
-	},
+	}
 }
 </script>
 
