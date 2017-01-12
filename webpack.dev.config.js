@@ -1,17 +1,16 @@
 var webpack = require('webpack')
-try {
-  require('os').networkInterfaces();
-} catch (e) {
-  require('os').networkInterfaces = () => ({});
-}
 
 module.exports = {
   cache: true,
-  devtool: 'eval',
+  watch: true,
+  devtool: 'source-map',
   entry: [
+  	'webpack/hot/dev-server',
+    'webpack-hot-middleware/client',
     './front/main.js'],
   output: {
     path: '/public/app',
+    publicPath: 'http://localhost:8888/',
     filename: 'app.js'
   },
 
@@ -28,17 +27,12 @@ module.exports = {
       },
       {
         test: /\.vue$/,
-        loader: 'vue-loader',
-        options: {
-          loaders: {
-            scss: 'vue-style-loader!css-loader!sass-loader',
-            sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax',
-          }
-        }
+        loader: 'vue-loader'
       }
     ]
   },
   plugins: [
+      new webpack.HotModuleReplacementPlugin(),
       new webpack.NoErrorsPlugin()
   ],
   resolve: {

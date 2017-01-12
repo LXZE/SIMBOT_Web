@@ -9,50 +9,50 @@ import * as util from 'util';
 import * as njk from 'nunjucks';
 
 // TODO : Delete all webpack component when in production
-import * as webpack from 'webpack';
-let webpackConfig = {
-  cache: true,
-  watch: true,
-  devtool: 'source-map',
-  entry: ['webpack/hot/dev-server',
-    'webpack-hot-middleware/client',
-    './front/main.js'],
-  output: {
-    path: '/public',
-    publicPath: 'http://localhost:8888/',
-    filename: 'app.js'
-  },
+// import * as webpack from 'webpack';
+// let webpackConfig = {
+//   cache: true,
+//   watch: true,
+//   devtool: 'source-map',
+//   entry: ['webpack/hot/dev-server',
+//     'webpack-hot-middleware/client',
+//     './front/main.js'],
+//   output: {
+//     path: '/public/app',
+//     publicPath: 'http://localhost:8888/',
+//     filename: 'app.js'
+//   },
 
-  module: {
-    loaders: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules|vue\/dist|vue-router\/|vue-loader\/|vue-hot-reload-api\//,
-        loader: 'babel-loader'
-      },
-      {
-        test: /\.scss$/,
-        loaders: ['style', 'css', 'sass']
-      },
-      {
-        test: /\.vue$/,
-        loader: 'vue-loader'
-      }
-    ]
-  },
-  plugins: [
-      new webpack.HotModuleReplacementPlugin(),
-      new webpack.NoErrorsPlugin()
-  ],
-  resolve: {
-    alias: {
-      'vue$': 'vue/dist/vue.common.js'
-    }
-  },
-};
-import * as webpackHotMiddleware from 'webpack-hot-middleware';
-import * as webpackDevMiddleware from 'webpack-dev-middleware';
-let compiler = webpack(webpackConfig);
+//   module: {
+//     loaders: [
+//       {
+//         test: /\.js$/,
+//         exclude: /node_modules|vue\/dist|vue-router\/|vue-loader\/|vue-hot-reload-api\//,
+//         loader: 'babel-loader'
+//       },
+//       {
+//         test: /\.scss$/,
+//         loaders: ['style', 'css', 'sass']
+//       },
+//       {
+//         test: /\.vue$/,
+//         loader: 'vue-loader'
+//       }
+//     ]
+//   },
+//   plugins: [
+//       new webpack.HotModuleReplacementPlugin(),
+//       new webpack.NoErrorsPlugin()
+//   ],
+//   resolve: {
+//     alias: {
+//       'vue$': 'vue/dist/vue.common.js'
+//     }
+//   },
+// };
+// import * as webpackHotMiddleware from 'webpack-hot-middleware';
+// import * as webpackDevMiddleware from 'webpack-dev-middleware';
+// let compiler = webpack(webpackConfig);
 
 class App {
 	public express: express.Application;
@@ -72,12 +72,12 @@ class App {
 		});
 
 		// TODO : Delete all webpack component when in production
-		this.express.use(webpackDevMiddleware(compiler,{
-    		publicPath: webpackConfig.output.publicPath,  stats: {colors: true}
-		}));
-		this.express.use(webpackHotMiddleware(compiler,{
-			log: console.log
-		}));
+		// this.express.use(webpackDevMiddleware(compiler,{
+  //   		publicPath: webpackConfig.output.publicPath,  stats: {colors: true}
+		// }));
+		// this.express.use(webpackHotMiddleware(compiler,{
+		// 	log: console.log
+		// }));
 	}
 	private routes(): void {
 		let router = express.Router();
