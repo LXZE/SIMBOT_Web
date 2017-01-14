@@ -2,7 +2,10 @@
 div
   .sidenav
     ul
-      li: a(@click="show.Modal = true") Create Room
+      li: a(@click="show.Modal = true")
+        i.el-icon-plus()
+          p() &nbsp;
+        p() Create Room
     #Modal
       el-dialog(title="Create a new room", v-model="show.Modal")
         el-form(:model="form", ref="form" )
@@ -24,8 +27,6 @@ div
 </template>
 
 <script>
-import Vue from 'vue';
-
 export default {
   name: 'Sidebar',
   data () {
@@ -55,13 +56,17 @@ export default {
   overflow-x: hidden;
   padding-top: 20px;
   ul{
+    padding-left: 5px;
     li {
       display: inline-block;
       font-size: 25px;
       a {
         font-size: 2vw;
         color: #818181;
-        transition: 0.3s
+        transition: 0.3s;
+        * {
+          display:inline-block;
+        }
       }
     }
   }

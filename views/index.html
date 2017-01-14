@@ -10,7 +10,9 @@
   </head>
   <body>
   	<div id="root">
-	  	<app></app>	
+      <transition name="fade">
+        <router-view></router-view>
+      </transition>
   	</div>
     <script src="app/app.js"></script>
   </body>
