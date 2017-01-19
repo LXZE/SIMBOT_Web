@@ -7,21 +7,21 @@
 	#room(v-else)
 		el-col(:span="20")
 			el-row(v-for="room in roomList")
-				router-link.link(:to="{ name: 'watch', params: {roomID: room.roomID} }")
-					el-card
+				el-card
+					router-link.link(:to="{ name: 'watch', params: {roomID: room.roomID, roomName: room.roomName} }")
 						| {{ room.roomName }}
-						.status(v-if="room.status == 'run'")
-							i.el-icon-loading
-							span &nbsp; Running
-						.status(v-else)
-							i.el-icon-time
-							span &nbsp; Waiting
-						p
-						label(v-if="room.status !== 'run'") Access Token = 
-							| {{ room.roomToken }}
-						label(v-else) &nbsp;
-						el-button.deleteBtn(type="danger", icon="delete", size="small") Delete
-					p 
+					.status(v-if="room.status == 'run'")
+						i.el-icon-loading
+						span &nbsp; Running
+					.status(v-else)
+						i.el-icon-time
+						span &nbsp; Waiting
+					p
+					label(v-if="room.status !== 'run'") Access Token = 
+						| {{ room.roomToken }}
+					label(v-else) &nbsp;
+					el-button.deleteBtn(type="danger", icon="delete", size="small") Delete
+				p 
 </template>
 <script>
 

@@ -4,8 +4,8 @@ div
     ul
       li: a(@click="show.Modal = true")
         i.el-icon-plus()
-          p() &nbsp;
-        p() Create Room
+          p &nbsp;
+        p(type="button") Create Room
     #Modal
       el-dialog(title="Create a new room", v-model="show.Modal")
         el-form(:model="form", ref="form" )
@@ -53,13 +53,13 @@ export default {
   top: 0;
   left: 0;
   background-color: #111;
-  overflow-x: hidden;
   padding-top: 20px;
   ul{
     padding-left: 5px;
     li {
       display: inline-block;
       font-size: 25px;
+      text-align: center;
       a {
         font-size: 2vw;
         color: #818181;
@@ -73,5 +73,8 @@ export default {
 }
 .sidenav ul li a:hover, .offcanvas a:focus{
     color: #f1f1f1;
+}
+#Modal {
+    z-index:10;
 }
 </style>

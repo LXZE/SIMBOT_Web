@@ -23,19 +23,8 @@ const app = new Vue({
 	router,
 	watch: {
 	    '$route' (to, from) {
-	      console.log('test')
+	      // console.log('test')
 	    }
   }
 
 }).$mount('#root');
-
-// var app = new Vue({
-//   router,
-//   el: '#root',
-
-//   // render: (h)=>{ return h(App) }
-//   // components: {
-//   // 	App
-//   // }
-// })
-
