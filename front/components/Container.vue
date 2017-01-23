@@ -3,10 +3,11 @@
 	label Room list
 	p
 	#noRoom(v-if="this.roomList.length === 0")
-		p No room created
+		el-col(:span="20")
+			el-card #[p No room created]
 	#room(v-else)
 		el-col(:span="20")
-			el-row(v-for="room in roomList")
+			el-row(v-for="(room,roomIdx) in roomList")
 				el-card
 					router-link.link(:to="{ name: 'watch', params: {roomID: room.roomID, roomName: room.roomName} }")
 						| {{ room.roomName }}
@@ -20,40 +21,28 @@
 					label(v-if="room.status !== 'run'") Access Token = 
 						| {{ room.roomToken }}
 					label(v-else) &nbsp;
-					el-button.deleteBtn(type="danger", icon="delete", size="small") Delete
+					el-button.deleteBtn(type="danger", icon="delete", size="small", @click="deleteRoom(roomIdx)") Delete
 				p 
 </template>
 <script>
-
+import { mapGetters, mapActions } from 'vuex'
 export default {
 	name: 'Container',
-	data () {
-		return {
-			roomList: [{
-				roomName: 'Untitled1',
-				status: 'run',
-				roomID: 1,
-				roomToken: 'arswftrcv'
-			},{
-				roomName: 'Untitled2',
-				status: 'wait',
-				roomID: 2,
-				roomToken: 'nkpfndund'
-			}]
-		}
-	},
+	// data () {
+	// 	return {
+	// 		roomList: [],
+	// 	}
+	// },
 	mounted: function(){
-		this.getRoomData();	
+		// this.getRoomData();	
 	},
-	methods: {
-		getRoomData: function(){
-			var url = '/room/'
-			this.$http.get(url).then((res)=>{
-				console.log('response', res.data);
-				// this.roomList = [];
-			})
-		}
-	}
+	methods: mapActions([
+		'deleteRoom'
+	]), 
+	computed: mapGetters({
+		roomList: 'roomList'
+	}),
+
 }
 </script>
 

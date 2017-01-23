@@ -8,6 +8,8 @@
 			span &nbsp; Room {{ name }} - [ ID : {{ id }} ]
 		.row
 			canvas#robotCanvas(width='800', height='400')
+		.row
+			span Step : {{ step }}
 </template>
 
 <script>
@@ -18,6 +20,7 @@ export default {
 			loading: false,
 			id: '',
 			name: '',
+			step: 0,
 			robots:[],	//array of object with these attr:x,y,direction,color1,color2
 			robotRadius:10,
 			obstacles:[],//array of object with these attr:x,y,x2,y2
@@ -62,9 +65,9 @@ export default {
 		drawRobot (ctx){
 			//simple robot painting as a sample
 			ctx.strokeStyle = "rgb(0,0,0)";
-			ctx.beginPath();
-			ctx.arc(100,75,50,0,2*Math.PI);
-			ctx.stroke();
+			// ctx.beginPath();
+			// ctx.arc(100,75,50,0,2*Math.PI);
+			// ctx.stroke();
 			//iterate robot from list
 			for(let robot of this.robots){
 				//style value are depend on robot owner and other...

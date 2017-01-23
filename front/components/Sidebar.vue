@@ -23,10 +23,11 @@ div
               el-input(placeholder="1", v-model="form.robotPerPlayer", auto-complete="off")
         span.dialog-footer(slot='footer')
           el-button(@click="show.Modal = false") Cancel
-          el-button(type="primary", @click="show.Modal = false") Create
+          el-button(type="primary", @click="createRoom(form); show.Modal = false") Create
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 export default {
   name: 'Sidebar',
   data () {
@@ -34,12 +35,18 @@ export default {
       show:{
         Modal: false,
       },
-      form:{
+      form:{}
+    }
+  },
+  methods: mapActions([
+    'createRoom',
+  ]),
+  created () {
+    this.form = {
         roomName: 'Untitled',
         maxPlayer: 4,
         robotPerPlayer: 1,
       }
-    }
   }
 }
 </script>
