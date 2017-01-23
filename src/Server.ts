@@ -67,7 +67,7 @@ export class Server extends EventEmitter{
 	}
 
 	public deleteRoom(roomID:number,callback?:Function){
-		// TODO : remove all of client in room
+		// TODO : check status before delete then remove all of client in room
 		console.log(`Room [${roomID}] deleted`);
 		this.handler.delete(roomID);
 	}

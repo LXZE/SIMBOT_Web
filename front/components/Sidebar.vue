@@ -1,29 +1,28 @@
 <template lang="pug">
-div
-  .sidenav
-    ul
-      li: a(@click="show.Modal = true")
-        i.el-icon-plus()
-          p &nbsp;
-        p(type="button") Create Room
-    #Modal
-      el-dialog(title="Create a new room", v-model="show.Modal")
-        el-form(:model="form", ref="form" )
+.sidenav
+  ul
+    li: a(@click="show.Modal = true")
+      i.el-icon-plus()
+        p &nbsp;
+      p(type="button") Create Room
+  #Modal
+    el-dialog(title="Create a new room", v-model="show.Modal")
+      el-form(:model="form", ref="form" )
 
-          el-form-item(label="Room name")
-            el-input(placeholder="Enter room name", v-model="form.roomName", auto-complete="off")
-          el-form-item
-            el-col(:span="11")
-              label Max player
-              el-input(placeholder="4", v-model="form.maxPlayer", auto-complete="off")          
-            el-col(:span="2")
-              p &nbsp;
-            el-col(:span="11")
-              label Robot per player
-              el-input(placeholder="1", v-model="form.robotPerPlayer", auto-complete="off")
-        span.dialog-footer(slot='footer')
-          el-button(@click="show.Modal = false") Cancel
-          el-button(type="primary", @click="createRoom(form); show.Modal = false") Create
+        el-form-item(label="Room name")
+          el-input(placeholder="Enter room name", v-model="form.roomName", auto-complete="off")
+        el-form-item
+          el-col(:span="11")
+            label Max player
+            el-input(placeholder="4", v-model="form.maxPlayer", auto-complete="off")          
+          el-col(:span="2")
+            p &nbsp;
+          el-col(:span="11")
+            label Robot per player
+            el-input(placeholder="1", v-model="form.robotPerPlayer", auto-complete="off")
+      span.dialog-footer(slot='footer')
+        el-button(@click="show.Modal = false") Cancel
+        el-button(type="primary", @click="createRoom(form); show.Modal = false") Create
 </template>
 
 <script>

@@ -30,25 +30,36 @@ export default {
 	name: 'Container',
 	data () {
 		return {
+			timer: '',
 		}
 	},
-	methods: mapActions([
-		'deleteRoom',
-	]), 
+	methods: {
+		...mapActions([
+			'deleteRoom',
+		]),
+		getRooms () {
+			this.$store.dispatch('getRooms')
+		}	
+	},
+	
 	computed: mapGetters({
 		roomList: 'roomList',
 		roomCount: 'roomCount',
 	}),
-	mounted: function(){
-		this.$store.dispatch('getRooms')
+	created: function(){
+		this.getRooms()
+    	this.timer = setInterval(this.getRooms,5000)
 	},
+	beforeDestroy() {
+		clearInterval(this.timer)
+	}
 
 }
 </script>
 
 <style lang="scss"> 
 .container {
-	margin-left: 250px;
+	margin-left: 25%;
 	.status {
 		float: right;
 		* {
