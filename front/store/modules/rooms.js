@@ -4,14 +4,26 @@ const state = {
 }
 
 const getters = {
-  // checkoutStatus: state => state.checkoutStatus
   roomList: state => state.rooms
 }
 
 const actions = {
   getRooms ({commit}) {
     commit('RECEIVE_ROOMS',{ rooms })
-  }
+  },
+
+  createRoom ({ commit }, roomData) {
+    commit('CREATE_ROOM',{
+      roomData: roomData,
+    })
+  },
+
+  deleteRoom ({ commit }, roomIdx) {
+    confirm('This room will deleted from server, proceed?')
+    ? commit('DELETE_ROOM',{
+      roomIdx: roomIdx
+    }) : '';
+  },
 }
 
 const mutations = {
@@ -31,7 +43,6 @@ const mutations = {
   },
 
   ['DELETE_ROOM'] (state, {roomIdx}){
-
     state.rooms.splice(roomIdx,1);
   },
 }
