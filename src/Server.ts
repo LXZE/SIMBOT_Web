@@ -6,6 +6,7 @@ import { Handler } from "./Handler";
 import { Sign } from './Sign';
 import * as uid from 'shortid';
 import * as msgpack from "msgpack-lite";
+import * as _ from 'underscore';
 
 export class Server extends EventEmitter{
 	protected server: WebSocketServer;
@@ -20,8 +21,20 @@ export class Server extends EventEmitter{
 		this.server.on('connection',this.onConnect);
 	}
 
-	public getRoomList(): {}{
-		return this.handler.getRoomList();
+	public getRoomList(): any{
+		return this.filterRoomProperty(this.handler.getRoomList());
+	}
+
+	private filterRoomProperty(rooms: any): any{
+		let tmpData = {};
+		for(var roomID in rooms){
+			tmpData[roomID] = {};
+			tmpData[roomID] = _.pick(rooms[roomID],['roomName','status','options']);
+			tmpData[roomID].status = Sign[rooms[roomID].status];
+			tmpData[roomID].roomToken = rooms[roomID].options.roomToken;
+			delete tmpData[roomID].options;
+		}
+		return tmpData;
 	}
 
 	public getRoomInfo(roomID:number): Room<any>{
@@ -50,11 +63,12 @@ export class Server extends EventEmitter{
 			throw new Error('Create room failed');
 		}
 		console.log(`Room ${room.roomName}[${room.roomID}] created`);
-		return room;
+		return _.pick(room,['roomID','roomName','status','options']);
 	}
 
 	public deleteRoom(roomID:number,callback?:Function){
 		// TODO : remove all of client in room
+		console.log(`Room [${roomID}] deleted`);
 		this.handler.delete(roomID);
 	}
 

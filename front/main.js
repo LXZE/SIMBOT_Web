@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import VueResource from 'vue-resource';
-// import Vuex from 'vuex';
 import VueRouter from 'vue-router';
 import Element from 'element-ui';
 
@@ -8,7 +7,6 @@ import routes from './routes';
 import store from './store';
 
 Vue.use(VueResource);
-// Vue.use(Vuex);
 Vue.use(VueRouter);
 Vue.use(Element);
 

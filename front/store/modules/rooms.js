@@ -1,49 +1,51 @@
+import Vue from 'vue'
 const state = {
-  rooms: [],
-  i: 0,
+  rooms: {},
+  count: 0,
 }
 
 const getters = {
-  roomList: state => state.rooms
+  roomList: state => state.rooms,
+  roomCount: state => state.count,
 }
 
 const actions = {
   getRooms ({commit}) {
-    commit('RECEIVE_ROOMS',{ rooms })
-  },
-
-  createRoom ({ commit }, roomData) {
-    commit('CREATE_ROOM',{
-      roomData: roomData,
+    Vue.http.get('/room').then((res)=>{
+      commit('RECEIVE_ROOMS',{rooms:res.data, count:Object.keys(res.data).length});
     })
   },
 
-  deleteRoom ({ commit }, roomIdx) {
-    confirm('This room will deleted from server, proceed?')
-    ? commit('DELETE_ROOM',{
-      roomIdx: roomIdx
-    }) : '';
+  createRoom ({ commit, dispatch }, roomData) {
+    let data = {
+      roomName: roomData.roomName,
+      maxPlayer: roomData.maxPlayer,
+      robotPerPlayer: roomData.robotPerPlayer,
+    }
+    Vue.http.post('/create',data).then((res)=>{
+      dispatch('getRooms'); 
+    });
+  },
+
+  deleteRoom ({ commit, dispatch }, roomID) {
+    confirm(`This room [${roomID}] will deleted from server, proceed?`)
+    ?
+      Vue.http.delete(`/${roomID}`).then((res)=>{
+        commit('DELETE_ROOM',roomID);
+        dispatch('getRooms');
+      })
+    : '';
   },
 }
 
 const mutations = {
-  ['RECEIVE_ROOMS'] (state, { rooms }){
-    state.rooms = rooms
+  ['RECEIVE_ROOMS'] (state,payload){
+    state.rooms = payload.rooms;
+    state.count = payload.count;
   },
 
-  ['CREATE_ROOM'] (state, { roomData }){
-    console.log(roomData.maxPlayer,roomData.roomName,roomData.robotPerPlayer);
-    state.rooms.push({
-      roomName: roomData.roomName + ' ' + state.i,
-      status: 'wait',
-      roomID: state.i,
-      roomToken: 'nkpfndund'
-    });
-    state.i+=1;
-  },
-
-  ['DELETE_ROOM'] (state, {roomIdx}){
-    state.rooms.splice(roomIdx,1);
+  ['DELETE_ROOM'] (state, {roomID}){
+    delete state.rooms[roomID];
   },
 }
 

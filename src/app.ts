@@ -112,8 +112,8 @@ class App {
 		router.post('/create',(req,res)=>{
 			var roomName = req.body.roomName || 'Untitled';
 			var options = {
-				maxPlayer: req.body.maxPlayer || 10,
-				robotPerPlayer: req.body.robotPerPlayer || 2,
+				maxPlayer: req.body.maxPlayer || 4,
+				robotPerPlayer: req.body.robotPerPlayer || 1,
 			}
 			var roomData = SV.createRoom(roomName,options);
 			res.json(roomData);
