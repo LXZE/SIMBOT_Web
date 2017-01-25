@@ -8,8 +8,8 @@ var room = 0;
 var options = {};
 
 var execute = (robot)=>{
-	robot.move(-1);
 	robot.turn(-1);
+	robot.move(-1);
 }
 
 Client.connect(url,name1,token,room,execute);

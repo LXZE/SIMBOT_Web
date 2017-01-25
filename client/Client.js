@@ -42,19 +42,23 @@ var run = (data)=>{
 
 class Robot {
 	constructor(id,data){
+		this.cmdRank = 0;
 		this.id = id;
 		this.IR = data.robot.IR;
+		this.smell = data.robot.smell;
 		this.ownerID = data.robot.ownerID;
 		this.robotID = data.robot.robotID;
 		cmdList[data.robot.robotID] = {};
 	}
 	move(val){
+		console.log(`mv ${val} [${this.cmdRank++}]`)
 		cmdType = Sign.CONTINUE_MOTION;
 		if(!cmdList[this.robotID].hasOwnProperty('move')){
 			Object.assign(cmdList[this.robotID],{move:val});
 		}
 	}
 	turn(deg){
+		console.log(`tr ${deg} [${this.cmdRank++}]`)
 		cmdType = Sign.CONTINUE_MOTION;
 		if(!cmdList[this.robotID].hasOwnProperty('turn')){
 			Object.assign(cmdList[this.robotID],{turn:deg});

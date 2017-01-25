@@ -1,5 +1,5 @@
 # SIMBOT_WEB
-Web based Robot Simulation. Built on Typescript, Express and WebSocket.
+Web based Robot Simulation. Built on Typescript, Express, WebSocket and Vue 2.0.
 
 ## Getting started
 
