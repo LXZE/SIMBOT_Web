@@ -106,7 +106,20 @@ export class MatchController{
 
 		//keep lowest value
 		//TODO: convert pointList to distSeen first
+		distSeen = pointList.map(function(x){
+			return this.lineLength(a,x);
+		});
+		let dist = distSeen.reduce(function(x,y){
+			return (x<y)?x:y;
+		});
+		if(dist<length){
+			return {detected:true, distance:dist};
+		}
+		else{
+			return {detected:false};
+		}
 		//below are old method
+		/*
 		let dist = distSeen.filter(function(x){
 			return x.detected;
 		}).map(function(x){
@@ -115,7 +128,7 @@ export class MatchController{
 			return (x<y)?x:y;
 		},length);
 		//must return sensorInfo type
-		return dist;
+		return dist;*/
 	}
 	public getAngleToFood(a:Point):number{
 		let food = this.getFoodPosition();
