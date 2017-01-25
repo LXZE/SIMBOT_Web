@@ -58,18 +58,30 @@ export class MatchController{
 		let line = {a:start,b:end};
 		let length = this.lineLength(line)
 		let distSeen = [];
+		let pointList = [];
 		//map boundary check
 		let mapSize = this.map.getMapSize();
 		let mapRectangle = {x:0,y:0,x2:mapSize.x,y2:mapSize.y};
-		distSeen.push(this.lineRectangleIntersect(line,length,mapRectangle));
+		let crossPoints = this.lineRectangleIntersect(line,mapRectangle);
+		for (let crossPoint of crossPoints){
+			pointList.add(crossPoint);
+		}
+		//distSeen.push(this.lineRectangleIntersect(line,length,mapRectangle));
+
 		//obstacle check
 		let obs = this.map.getObstacles();
 		for (let ob of obs) {
-			distSeen.push(this.lineRectangleIntersect(line,length,ob));
+			//distSeen.push(this.lineRectangleIntersect(line,length,ob));
+			let crossPoints = this.lineRectangleIntersect(line,ob);
+			for(let crossPoint of crossPoints){
+				pointList.add(crossPoint);
+			}
 		}
 		//other robot check - not implemented
 
 		//keep lowest value
+		//TODO: convert pointList to distSeen first
+		//below are old method
 		let dist = distSeen.filter(function(x){
 			return x.detected;
 		}).map(function(x){
@@ -77,6 +89,7 @@ export class MatchController{
 		}).reduce(function(x,y){
 			return (x<y)?x:y;
 		},length);
+		//must return sensorInfo type
 		return dist;
 	}
 	public getAngleToFood(a:Point):number{
@@ -144,22 +157,24 @@ export class MatchController{
 		return {x:px,y:py};
 
 	}
-	private lineRectangleIntersect(a:Line,l:number,b:Rectangle):SensorInfo{
+	//private lineRectangleIntersect(a:Line,l:number,b:Rectangle){
+	private lineRectangleIntersect(a:Line,b:Rectangle){
 		let bLines = this.getLinesFromRectangle(b);
+		let crossPoints = [];
 		for (let line of bLines){
 			let crossPoint = this.getLineIntersect(a,line);
-			if(crossPoint!=0)
-			{
-				if(this.pointOnRectangle(crossPoint,b))
-				{
-					let dist = this.distBetweenPoint(crossPoint,a.a);
-					if(dist <= l){
-						return {detected:true,distance:dist};
-					}
+			if(crossPoint!=0){
+				if(this.pointOnRectangle(crossPoint,b)){
+					crossPoints.add(crossPoint);
+					//let dist = this.distBetweenPoint(crossPoint,a.a);
+					//if(dist <= l){
+					//	return {detected:true,distance:dist};
+					//}
 				}
 			}
 		}
-		return {detected:false};
+		//return {detected:false};
+		return crossPoints;
 	}
 	private circleInRectangle(A:Circle, B:Rectangle):boolean{
 		return (A.x-A.radius>=B.x) && (A.y-A.radius>=B.y) && (A.x+A.radius<=B.x2) && (A.y+A.radius<=B.y2);
@@ -207,7 +222,7 @@ export class MatchController{
 			return (A.x2 >= B.x && A.x <= B.x2 && A.y2 >= B.y && A.y <= B.y2);
 		else
 			return (A.x2 > B.x && A.x < B.x2 && A.y2 > B.y && A.y < B.y2);
-		
+
 	}
 	private circleCollided(A:Circle, B:Circle,countTouchAsCollide:boolean=false):boolean{
 		let dist = this.distBetweenPoint(A,B);
