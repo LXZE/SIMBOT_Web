@@ -8,8 +8,9 @@ var room = 0;
 var options = {};
 
 var execute = (robot)=>{
-	robot.move(1);
-	robot.turn(1);
+	console.log(robot.IR, robot.smell);
+	robot.move(Math.random()*10);
+	robot.turn((Math.random()*360)-180);
 }
 
 Client.connect(url,name1,token,room,execute);

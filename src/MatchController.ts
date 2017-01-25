@@ -31,7 +31,7 @@ export interface SensorInfo{
 
 export class MatchController{
 	private room:Room<any>;
-	private robotList:Robot[] = [];
+	private robotList:{[robotID:string]:Robot} = {};
 	private map:Map;
 
 	constructor(room:Room<any>,options:any = {}){
@@ -40,18 +40,43 @@ export class MatchController{
 	}
 
 	public placeRobot(robot:Robot){
-		this.robotList.push(robot);
+		this.robotList[robot.robotID] = robot;
+		let sensorValue = robot.getSensorsValue();
+		this.robotList[robot.robotID] = (<any>Object).assign(robot,sensorValue)
+			
+	}
+
+	public removeRobot(robotID:string){
+		delete this.robotList[robotID]
 	}
 
 	public clearRobot(){
-		this.robotList = [];
+		this.robotList = {};
+	}
+
+	private setRobotSensorValue(){
+		(<any>Object).entries(this.robotList).forEach(([robotID,robot])=>{
+			let sensorValue = robot.getSensorsValue();
+			this.robotList[robotID] = (<any>Object).assign(robot,sensorValue);
+		})
+	}
+
+	public doCommand(command:any,commandType:number,setMovementType:number){
+		// TODO: arrange command of robot
+		(<any>Object).entries(command).forEach(([robotID,command])=>{
+			if(commandType == setMovementType){
+				this.robotList[robotID].move(command.move);
+				this.robotList[robotID].turn(command.turn);
+			}
+		});
+		this.setRobotSensorValue();
 	}
 
 	public getFoodPosition():Point{
 		return this.map.getFoodPosition();
 	}
 
-	public getRobotData():Robot[]{
+	public getRobotData():{[robotID:string]:Robot}{
 		return this.robotList;
 	}
 	public distSensorScan(start:Point,end:Point):SensorInfo{

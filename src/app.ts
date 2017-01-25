@@ -113,7 +113,7 @@ class App {
 			var roomName = req.body.roomName || 'Untitled';
 			var options = {
 				maxPlayer: req.body.maxPlayer || 4,
-				robotPerPlayer: req.body.robotPerPlayer || 1,
+				robotPerPlayer: req.body.robotPerPlayer || 2,
 			}
 			var roomData = SV.createRoom(roomName,options);
 			res.json(roomData);

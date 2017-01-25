@@ -65,16 +65,33 @@ export class Room<Type> extends EventEmitter{
 					this.matchCTRL.placeRobot(newRobot);
 				}
 			});
-
 			let robotData = this.matchCTRL.getRobotData();
 			let tmpRobot;
-			robotData.forEach((robot)=>{
-				tmpRobot = _.pick(robot,['IR','ownerID','robotID'])
+			(<any>Object).entries(robotData).forEach(([robotID,robot])=>{
+				tmpRobot = _.pick(robot,['IR','smell','ownerID','robotID'])
 				this.state[robot.ownerID].push({step:this.step,robot:tmpRobot});
 			});
 			this.status = Sign.ROOM_RUN;
 			this.runSimulation();
 		}
+	}
+
+	private setState(){
+
+		let robotData = this.matchCTRL.getRobotData();
+		let tmpRobot;
+		(<any>Object).entries(robotData).forEach(([robotID,robotInfo])=>{
+			tmpRobot = _.pick(robotInfo,['IR','smell','ownerID','robotID'])
+			try{
+				let idx = this.state[robotInfo.ownerID].findIndex((elem)=>{
+					return elem.robot.robotID == tmpRobot.robotID
+				})
+				this.state[robotInfo.ownerID][idx].robot = tmpRobot;
+				this.state[robotInfo.ownerID][idx].step+=1;
+			}catch(e){
+				this.matchCTRL.removeRobot(robotID);
+			}
+		});
 	}
 
 	public pause(){
@@ -97,21 +114,19 @@ export class Room<Type> extends EventEmitter{
 
 	private runSimulation(){
 		this.broadcast(this.state);
-		this.on(`trigger_${this.roomID}`,(gatherData)=>{
-			console.log(gatherData)
-			this.calculate();
+		this.on(`trigger_${this.roomID}`,(gatherData)=>{		
 			this.step+=1;
+			this.calculate(gatherData);
 			this.gathered = {};
 			this.broadcast(this.state);
 		});
 	}
 
-	private calculate(){
-		Object.keys(this.state).forEach(clientID=>{
-			this.state[clientID].forEach(robot=>{
-				robot.step++;
-			})
-		});
+	private calculate(gatherData:any){
+		(<any>Object).entries(gatherData).forEach(([ownerID,data])=>{
+			this.matchCTRL.doCommand(data.command,parseInt(data.type),this.movementType);
+		})
+		this.setState();
 		console.log(`${this.roomName}[${this.roomID}] step = `,this.step);
 	}
 
