@@ -33,13 +33,13 @@ export function getLinesFromRectangle(p:Rectangle):Line[]{
 	return [l1,l2,l3,l4];
 	*/
 	let points = getPointsFromRectangle(p);
-	let l1 = {a:p[0],b:p[1]};
-	let l2 = {a:p[1],b:p[2]};
-	let l3 = {a:p[2],b:p[3]};
-	let l4 = {a:p[3],b:p[0]};
+	let l1 = {a:points[0],b:points[1]};
+	let l2 = {a:points[1],b:points[2]};
+	let l3 = {a:points[2],b:points[3]};
+	let l4 = {a:points[3],b:points[0]};
 	return [l1,l2,l3,l4];
 }
-export functions getPointsFromRectangle(p:Rectangle):Point[]{
+export function getPointsFromRectangle(p:Rectangle):Point[]{
 	let x = p.x;
 	let y = p.y;
 	let w = p.w;
@@ -48,10 +48,10 @@ export functions getPointsFromRectangle(p:Rectangle):Point[]{
 	let p2 = {x:x,y:y+h};
 	let p3 = {x:x+w,y:y+h};
 	let p4 = {x:x+w,y:y};
-	return [p1,p2,p3,p4];1
+	return [p1,p2,p3,p4];
 }
 
-export function distBetweenPoints(a:Point,b:Point):number{
+export function distBetweenPoints(A:Point,B:Point):number{
 	let dx = A.x-B.x;
 	let dy = A.y-B.y;
 	return Math.sqrt(dx*dx+dy*dy);
@@ -87,7 +87,7 @@ export function getLineRectangleIntersectPoints(a:Line,b:Rectangle):Point[]{
 	let crossPoints = [];
 	for(let line of bLines){
 		let crossPoint = this.getLineIntersectPoint(a,line);
-		if(crossPoint!=0 && isPointOnRectangle(crossPoint,b){
+		if(crossPoint!=0 && isPointOnRectangle(crossPoint,b)){
 			crossPoints.push(crossPoint);
 		}
 	}
@@ -101,7 +101,7 @@ export function isPointOnRectangle(a:Point,b:Rectangle):boolean{
 	return (a.x>=b.x) && (a.x<=b.x+b.w) && (a.y>=b.y) && (a.y<=b.y+b.h);
 }
 
-export function isCollidedCircleRectangle(a:circle,b:Rectangle,touchCollide:boolean=false):boolean{
+export function isCollidedCircleRectangle(a:Circle,b:Rectangle,touchCollide:boolean=false):boolean{
 	//Method 1: check if circle center is in rectangle, then check if circle intersect any rectangle's line
 	//not implemented
 

@@ -69,7 +69,7 @@ class Robot {
 var send = (data,step)=>{
 	console.log(`Step ${step} data = ${util.inspect(data)}`);
 	// TODO : remove timeout in production or reduce time
-	var time = 2;
+	var time = 0.8;
 	setTimeout(()=>{
 		try{
 			ws.send(msgpack.encode([Sign.CLIENT_DATA,{type:cmdType, step:step, command:data
