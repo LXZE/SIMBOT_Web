@@ -87,7 +87,7 @@ export function getLineRectangleIntersectPoints(a:Line,b:Rectangle):Point[]{
 	let crossPoints = [];
 	for(let line of bLines){
 		let crossPoint = this.getLineIntersectPoint(a,line);
-		if(crossPoint!=0){
+		if(crossPoint!=0 && isPointOnRectangle(crossPoint,b){
 			crossPoints.push(crossPoint);
 		}
 	}
