@@ -65,8 +65,8 @@ export class MatchController{
 		// TODO: arrange command of robot
 		(<any>Object).entries(command).forEach(([robotID,command])=>{
 			if(commandType == setMovementType){
-				this.robotList[robotID].move(command.move);
-				this.robotList[robotID].turn(command.turn);
+				if('move' in command) this.robotList[robotID].move(command.move);
+				if('turn' in command) this.robotList[robotID].turn(command.turn);
 			}
 		});
 		this.setRobotSensorValue();
@@ -89,7 +89,7 @@ export class MatchController{
 		let mapRectangle = {x:0,y:0,x2:mapSize.x,y2:mapSize.y};
 		let crossPoints = this.lineRectangleIntersect(line,mapRectangle);
 		for (let crossPoint of crossPoints){
-			pointList.add(crossPoint);
+			pointList.push(crossPoint);
 		}
 		//distSeen.push(this.lineRectangleIntersect(line,length,mapRectangle));
 
@@ -99,15 +99,16 @@ export class MatchController{
 			//distSeen.push(this.lineRectangleIntersect(line,length,ob));
 			let crossPoints = this.lineRectangleIntersect(line,ob);
 			for(let crossPoint of crossPoints){
-				pointList.add(crossPoint);
+				pointList.push(crossPoint);
 			}
 		}
 		//other robot check - not implemented
 
 		//keep lowest value
 		//TODO: convert pointList to distSeen first
-		distSeen = pointList.map(function(x){
-			return this.lineLength(a,x);
+		distSeen = pointList.map((x)=>{
+			// return this.lineLength(start,x);
+			return this.lineLength({a:start,b:x});
 		});
 		let dist = distSeen.reduce(function(x,y){
 			return (x<y)?x:y;
@@ -203,7 +204,7 @@ export class MatchController{
 			let crossPoint = this.getLineIntersect(a,line);
 			if(crossPoint!=0){
 				if(this.pointOnRectangle(crossPoint,b)){
-					crossPoints.add(crossPoint);
+					crossPoints.push(crossPoint);
 					//let dist = this.distBetweenPoint(crossPoint,a.a);
 					//if(dist <= l){
 					//	return {detected:true,distance:dist};
