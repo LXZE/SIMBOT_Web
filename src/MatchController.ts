@@ -43,7 +43,7 @@ export class MatchController{
 		this.robotList[robot.robotID] = robot;
 		let sensorValue = robot.getSensorsValue();
 		this.robotList[robot.robotID] = (<any>Object).assign(robot,sensorValue)
-			
+
 	}
 
 	public removeRobot(robotID:string){
