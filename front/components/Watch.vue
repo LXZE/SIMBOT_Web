@@ -20,11 +20,13 @@ export default {
 			loading: false,
 			id: '',
 			name: '',
-			step: 0,
+			
 			obstacles:[],//array of object with these attr:x,y,x2,y2
 			robotRadius:10,
+			step: 0,
 			robots:[],	//array of object with these attr:x,y,direction,color1,color2
 			foodPosition:{x:0,y:0},	//accept only single food
+			stateUnderAccess:false,
 
 			//cache for drawing
 			drawingStep:0,
@@ -41,7 +43,12 @@ export default {
 			this.loading = true;
 			this.id = this.$route.params.roomID;
 			this.name = this.$route.params.roomName;
+			
 			//do the data fetching
+			this.stateUnderAccess = true;
+			//update value
+			this.stateUnderAccess = false;
+			
 			if(!this.drawRequested){
 				this.drawRequested = true;
 				requestAnimationFrame(draw);
@@ -52,9 +59,11 @@ export default {
 			//this.loading = false;
 			//clone state to drawingState
 			//CRITICAL SECTION
+			this.stateUnderAccess = true;
 			this.drawingStep = Step;
 			this.drawingRobots = this.robots.slice(0);
 			this.drawingFoodPosition = {x:this.foodPosition.x,y:this.foodPosition.y};
+			this.stateUnderAccess = false;
 			//END CRITICAL SECTION
 			this.drawRequested = false;
 
