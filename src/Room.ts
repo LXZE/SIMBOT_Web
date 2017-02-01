@@ -9,6 +9,9 @@ import * as msgpack from "msgpack-lite";
 import * as _ from 'underscore';
 import * as Amqp from "amqp-ts";
 
+import { config } from 'dotenv';
+config()
+
 export class Room<Type> extends EventEmitter{
 	public roomID: number;
 	public roomName: string;
@@ -45,7 +48,7 @@ export class Room<Type> extends EventEmitter{
 
 		try{
 			console.info('Connect to MQ server...');
-			this.mqConn = new Amqp.Connection("amqp://guest:guest@localhost:5672");
+			this.mqConn = new Amqp.Connection(`amqp://guest:guest@${process.env.MQ_URL}:5672`);
 		}catch(e){
 			console.error('Cannot connect to mq server');
 			throw new Error('Cannot connect to mq server');

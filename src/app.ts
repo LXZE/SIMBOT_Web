@@ -40,7 +40,7 @@ let webpackConfig = {
         options: {
           loaders: {
             scss: 'vue-style-loader!css-loader!sass-loader',
-            sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax',
+            // sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax',
           }
         }
       }
@@ -48,13 +48,18 @@ let webpackConfig = {
   },
   plugins: [
       new webpack.HotModuleReplacementPlugin(),
-      new webpack.NoErrorsPlugin()
+      new webpack.NoEmitOnErrorsPlugin()
   ],
   resolve: {
     alias: {
       'vue$': 'vue/dist/vue.common.js'
     }
   },
+  node: {
+	// fs: 'empty',
+	net: false,
+	tls: false
+  }
 };
 import * as webpackHotMiddleware from 'webpack-hot-middleware';
 import * as webpackDevMiddleware from 'webpack-dev-middleware';

@@ -13,15 +13,22 @@
 </template>
 
 <script>
+import { Stomp } from 'stompjs/lib/stomp.js'
+
 export default {
 	name: 'Watch',
 	data () {
 		return {
+			// TODO: change to localhost on production
+			url: '10.35.23.97',
+
 			loading: false,
 			id: '',
 			name: '',
-			
-			obstacles:[],//array of object with these attr:x,y,x2,y2
+				
+			client: '',
+
+			obstacles:[], //array of object with these attr:x,y,x2,y2
 			robotRadius:10,
 			step: 0,
 			robots:[],	//array of object with these attr:x,y,direction,color1,color2
@@ -32,28 +39,30 @@ export default {
 			drawingStep:0,
 			drawingRobots:[],
 			drawingFoodPosition:{x:0,y:0},
-			drawRequested:false;
+			drawRequested:false,
 		}
 	},
 	methods: {
 		// getRobotData: function(){
 
 		// },
-		onConnected(frame){
-			console.log('Connected: ' + frame);
-			// this.$stompClient.subscribe('/topic/username', this.responseCallback, this.onFailed);
+		on_connect (x) {
+			var id = this.client.subscribe("/queue/test", function(m) {
+				console.log('ws connect: ',m.body);
+			});
 		},
-		onFailed(frame){
-			console.log('Failed: ' + frame);
-		}, 
-		connectSrv(){
-			var headers = {
-				"login": 'guest',
-				"passcode": 'guest',
-			};
-			this.connetWM(headers, this.onConnected, this.onFailed);    
-			},
+		on_error () {
+			console.log('error');
+		},
 		fetchData (){
+
+			var ws = new WebSocket(`ws://${this.url}:15674/ws`)
+			this.client = Stomp.over(ws);
+      		this.client.connect('guest', 'guest', this.on_connect, this.on_error, '/');
+			this.client.onreceive = function(m) {
+				console.log('Stomp get: ',m.body);
+			}
+
 			this.loading = true;
 			this.id = this.$route.params.roomID;
 			this.name = this.$route.params.roomName;
@@ -65,7 +74,7 @@ export default {
 			
 			if(!this.drawRequested){
 				this.drawRequested = true;
-				requestAnimationFrame(draw);
+				// requestAnimationFrame(draw);
 			}
 			this.loading = false;
 		},
@@ -74,7 +83,7 @@ export default {
 			//clone state to drawingState
 			//CRITICAL SECTION
 			this.stateUnderAccess = true;
-			this.drawingStep = Step;
+			this.drawingStep = this.step;
 			this.drawingRobots = this.robots.slice(0);
 			this.drawingFoodPosition = {x:this.foodPosition.x,y:this.foodPosition.y};
 			this.stateUnderAccess = false;
@@ -137,8 +146,13 @@ export default {
 		this.draw();
 	},
 	created (){
-		this.connectSrv();
 		this.fetchData();
+	},
+	beforeDestroy (){
+		this.client.disconnect(function() {
+			console.log("Client disconnect from MQ");
+		});
+
 	}
 }
 </script>
