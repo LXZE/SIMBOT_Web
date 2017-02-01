@@ -31,6 +31,20 @@ export default {
 		// getRobotData: function(){
 
 		// },
+		onConnected(frame){
+			console.log('Connected: ' + frame);
+			// this.$stompClient.subscribe('/topic/username', this.responseCallback, this.onFailed);
+		},
+		onFailed(frame){
+			console.log('Failed: ' + frame);
+		}, 
+		connectSrv(){
+			var headers = {
+				"login": 'guest',
+				"passcode": 'guest',
+			};
+			this.connetWM(headers, this.onConnected, this.onFailed);    
+			},
 		fetchData (){
 			this.loading = true;
 			this.id = this.$route.params.roomID;
@@ -98,6 +112,7 @@ export default {
 		this.draw();
 	},
 	created (){
+		this.connectSrv();
 		this.fetchData();
 	}
 }

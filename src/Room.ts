@@ -2,11 +2,12 @@ import { EventEmitter } from "events";
 import { Client } from "./index";
 import { Sign } from "./Sign";
 import { Robot } from './Robot';
+import { MatchController } from './MatchController';
+
 import * as util from 'util';
 import * as msgpack from "msgpack-lite";
 import * as _ from 'underscore';
-
-import { MatchController } from './MatchController';
+import * as Amqp from "amqp-ts";
 
 export class Room<Type> extends EventEmitter{
 	public roomID: number;
@@ -19,7 +20,6 @@ export class Room<Type> extends EventEmitter{
 	private state: { [clientID:string]:any[] } = {};
 	private gathered:any = {};
 
-	protected iteration: NodeJS.Timer;
 	protected step:number = 0;
 	public maxPlayer: number;
 	protected lock: boolean;
@@ -28,6 +28,9 @@ export class Room<Type> extends EventEmitter{
 	private msgOption:{} = {binary:true};
 
 	private matchCTRL:MatchController;
+
+	private mqConn:any;
+	private exchange:any;
 
 	constructor(options: any = {}){
 		super();
@@ -39,6 +42,16 @@ export class Room<Type> extends EventEmitter{
 		this.options = options;
 		this.lock = false;
 		this.status = Sign.ROOM_STOP;
+
+		try{
+			console.info('Connect to MQ server...');
+			this.mqConn = new Amqp.Connection("amqp://guest:guest@localhost:5672");
+		}catch(e){
+			console.error('Cannot connect to mq server');
+			throw new Error('Cannot connect to mq server');
+		}
+		this.exchange = this.mqConn.declareExchange('simbot_exchange');
+		this.exchange.send(new Amqp.Message('Test'));
 	}
 
 	public getClientAmount(): number{

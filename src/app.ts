@@ -1,7 +1,6 @@
 import * as path from 'path';
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
-// import * as WebSocket from "ws";
 import * as uid from "shortid";
 import { SV } from './index';
 import { Room } from './Room';
