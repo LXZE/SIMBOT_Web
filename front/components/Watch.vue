@@ -20,11 +20,19 @@ export default {
 			loading: false,
 			id: '',
 			name: '',
+			
+			obstacles:[],//array of object with these attr:x,y,x2,y2
+			robotRadius:10,
 			step: 0,
 			robots:[],	//array of object with these attr:x,y,direction,color1,color2
-			robotRadius:10,
-			obstacles:[],//array of object with these attr:x,y,x2,y2
 			foodPosition:{x:0,y:0},	//accept only single food
+			stateUnderAccess:false,
+
+			//cache for drawing
+			drawingStep:0,
+			drawingRobots:[],
+			drawingFoodPosition:{x:0,y:0},
+			drawRequested:false;
 		}
 	},
 	methods: {
@@ -49,10 +57,30 @@ export default {
 			this.loading = true;
 			this.id = this.$route.params.roomID;
 			this.name = this.$route.params.roomName;
-			// this.draw();
+			
+			//do the data fetching
+			this.stateUnderAccess = true;
+			//update value
+			this.stateUnderAccess = false;
+			
+			if(!this.drawRequested){
+				this.drawRequested = true;
+				requestAnimationFrame(draw);
+			}
+			this.loading = false;
 		},
 		draw (){
-			this.loading = false;
+			//this.loading = false;
+			//clone state to drawingState
+			//CRITICAL SECTION
+			this.stateUnderAccess = true;
+			this.drawingStep = Step;
+			this.drawingRobots = this.robots.slice(0);
+			this.drawingFoodPosition = {x:this.foodPosition.x,y:this.foodPosition.y};
+			this.stateUnderAccess = false;
+			//END CRITICAL SECTION
+			this.drawRequested = false;
+
 			var canvas = document.getElementById('robotCanvas');
 			var ctx = canvas.getContext('2d');
 			var centerX = canvas.width / 2;
@@ -74,16 +102,13 @@ export default {
 		},
 		drawFood (ctx){
 			ctx.fillStyle = "rgb(0,200,0)";
-			ctx.fillRect (this.foodPosition.x-10,this.foodPosition.y-10,20,20);
+			ctx.fillRect (this.drawingFoodPosition.x-10,this.drawingFoodPosition.y-10,20,20);
 		},
 		drawRobot (ctx){
 			//simple robot painting as a sample
 			ctx.strokeStyle = "rgb(0,0,0)";
-			// ctx.beginPath();
-			// ctx.arc(100,75,50,0,2*Math.PI);
-			// ctx.stroke();
 			//iterate robot from list
-			for(let robot of this.robots){
+			for(let robot of this.drawingRobots){
 				//style value are depend on robot owner and other...
 				ctx.strokeStyle = robot.color1;
 				ctx.fillStyle = robot.color2;
