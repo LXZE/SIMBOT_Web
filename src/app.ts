@@ -54,11 +54,6 @@ let webpackConfig = {
     alias: {
       'vue$': 'vue/dist/vue.common.js'
     }
-  },
-  node: {
-	// fs: 'empty',
-	net: false,
-	tls: false
   }
 };
 import * as webpackHotMiddleware from 'webpack-hot-middleware';

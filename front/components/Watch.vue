@@ -59,6 +59,7 @@ export default {
 			var ws = new WebSocket(`ws://${this.url}:15674/ws`)
 			this.client = Stomp.over(ws);
       		this.client.connect('guest', 'guest', this.on_connect, this.on_error, '/');
+			this.client.heartbeat.incoming = 0;
 			this.client.onreceive = function(m) {
 				console.log('Stomp get: ',m.body);
 			}
