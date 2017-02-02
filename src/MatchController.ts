@@ -2,7 +2,7 @@ import { Room } from './Room';
 import { Map } from './Map';
 import { Robot } from './Robot';
 import * as Geometry from './Geometry';
-import { Point } from './Geometry';
+import { Point, Rectangle } from './Geometry';
 
 
 export interface SensorInfo{
@@ -57,6 +57,14 @@ export class MatchController{
 		return this.map.getFoodPosition();
 	}
 
+	public getMapInfo():any{
+		return {
+			foodPosition: this.map.getFoodPosition(),
+			mapSize: this.map.getMapSize(),
+			obstacle: this.map.getObstacles(),
+		};
+	}
+
 	public getRobotData():{[robotID:string]:Robot}{
 		return this.robotList;
 	}
@@ -67,13 +75,13 @@ export class MatchController{
 		//map boundary check
 		let mapSize = this.map.getMapSize();
 		let mapRectangle = {x:0,y:0,w:mapSize.x,h:mapSize.y};
-		pointList.concat(Geometry.getLineRectangleIntersectPoints(line,mapRectangle));
-	
+		pointList = pointList.concat(Geometry.getLineRectangleIntersectPoints(line,mapRectangle));
 		//obstacle check
 		let obs = this.map.getObstacles();
 		for (let ob of obs) {
-			pointList.concat(Geometry.getLineRectangleIntersectPoints(line,mapRectangle));
+			pointList = pointList.concat(Geometry.getLineRectangleIntersectPoints(line,mapRectangle));
 		}
+
 		//other robot check - not implemented
 
 		//keep lowest value

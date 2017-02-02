@@ -46,38 +46,43 @@ export default {
 		// getRobotData: function(){
 
 		// },
-		on_connect (x) {
-			var id = this.client.subscribe("/queue/test", function(m) {
-				console.log('ws connect: ',m.body);
-			});
-		},
-		on_error () {
-			console.log('error');
-		},
-		fetchData (){
+		on_message(m) {
+			let msgData = JSON.parse(m.body);
 
-			var ws = new WebSocket(`ws://${this.url}:15674/ws`)
-			this.client = Stomp.over(ws);
-      		this.client.connect('guest', 'guest', this.on_connect, this.on_error, '/');
-			this.client.heartbeat.incoming = 0;
-			this.client.onreceive = function(m) {
-				console.log('Stomp get: ',m.body);
-			}
-
-			this.loading = true;
-			this.id = this.$route.params.roomID;
-			this.name = this.$route.params.roomName;
-			
 			//do the data fetching
 			this.stateUnderAccess = true;
 			//update value
+			this.robots = msgData.robot;
+			this.obstacles = msgData.obstacle;
+			this.foodPosition = msgData.foodPosition;
+			this.step = msgData.step;
+
+
 			this.stateUnderAccess = false;
 			
 			if(!this.drawRequested){
 				this.drawRequested = true;
-				// requestAnimationFrame(draw);
+				window.requestAnimationFrame(this.draw);
 			}
-			this.loading = false;
+		},
+		on_connect (x) {
+			var id = this.client.subscribe(`/queue/simbot_queue_${this.id}`,this.on_message);
+		},
+		on_error () {
+			console.log('WS Stomp error');
+		},
+		fetchData (){ // first load
+			this.loading = true;
+
+			var ws = new WebSocket(`ws://${this.url}:15674/ws`)
+			this.client = Stomp.over(ws);
+			this.client.connect('guest', 'guest', this.on_connect, this.on_error, '/');
+			this.client.heartbeat.outgoing = 0;
+			this.client.heartbeat.incoming = 0;
+
+			this.id = this.$route.params.roomID;
+			this.name = this.$route.params.roomName;
+			this.loading = false;			
 		},
 		draw (){
 			//this.loading = false;
@@ -87,6 +92,7 @@ export default {
 			this.drawingStep = this.step;
 			this.drawingRobots = this.robots.slice(0);
 			this.drawingFoodPosition = {x:this.foodPosition.x,y:this.foodPosition.y};
+			this.drawingObstacles = this.obstacles.slice(0);
 			this.stateUnderAccess = false;
 			//END CRITICAL SECTION
 			this.drawRequested = false;
@@ -106,8 +112,8 @@ export default {
 			ctx.strokeStyle = "rgb(0,0,0)";
 			ctx.fillStyle = "rgba(200,200,200,0.4)";
 			for (let ob of this.obstacles){
-				fillRect(ob.x,ob.y,ob.x2-ob.x,ob.y2-ob.y);
-				strokeRect(ob.x,ob.y,ob.x2-ob.x,ob.y2-ob.y);
+				ctx.fillRect(ob.x,ob.y,ob.w,ob.h);
+				ctx.strokeRect(ob.x,ob.y,ob.w,ob.h);
 			}
 		},
 		drawFood (ctx){

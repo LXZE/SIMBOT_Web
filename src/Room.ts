@@ -34,6 +34,7 @@ export class Room<Type> extends EventEmitter{
 
 	private mqConn:any;
 	private exchange:any;
+	private queue:any;
 
 	constructor(options: any = {}){
 		super();
@@ -53,8 +54,10 @@ export class Room<Type> extends EventEmitter{
 			console.error('Cannot connect to mq server');
 			throw new Error('Cannot connect to mq server');
 		}
-		this.exchange = this.mqConn.declareExchange('simbot_exchange');
-		this.exchange.send(new Amqp.Message('Test'));
+		this.exchange = this.mqConn.declareExchange(`simbot_exchange_${this.roomID}`,'fanout');
+		this.queue = this.mqConn.declareQueue(`simbot_queue_${this.roomID}`);
+		this.queue.bind(this.exchange);
+		this.exchange.send(new Amqp.Message(`Initial room ${this.roomID}`));
 	}
 
 	public getClientAmount(): number{
@@ -84,11 +87,19 @@ export class Room<Type> extends EventEmitter{
 			let robotData = this.matchCTRL.getRobotData();
 			let tmpRobot;
 			(<any>Object).entries(robotData).forEach(([robotID,robot])=>{
-				tmpRobot = _.pick(robot,['IR','smell','ownerID','robotID'])
+				tmpRobot = this.selectRobotProperty(robot,'client');
 				this.state[robot.ownerID].push({step:this.step,robot:tmpRobot});
 			});
 			this.status = Sign.ROOM_RUN;
 			this.runSimulation();
+		}
+	}
+
+	private selectRobotProperty(robot:Robot,type:string):Robot{
+		if(type == 'client'){
+			return _.pick(robot,['IR','smell','ownerID','robotID'])
+		}else if(type == 'viewer'){
+			return _.pick(robot,['ownerID','robotID','x','y','direction','options'])
 		}
 	}
 
@@ -97,7 +108,7 @@ export class Room<Type> extends EventEmitter{
 		let robotData = this.matchCTRL.getRobotData();
 		let tmpRobot;
 		(<any>Object).entries(robotData).forEach(([robotID,robotInfo])=>{
-			tmpRobot = _.pick(robotInfo,['IR','smell','ownerID','robotID'])
+			tmpRobot = this.selectRobotProperty(robotInfo,'client');
 			try{
 				let idx = this.state[robotInfo.ownerID].findIndex((elem)=>{
 					return elem.robot.robotID == tmpRobot.robotID
@@ -192,6 +203,15 @@ export class Room<Type> extends EventEmitter{
 				this.removeClient(client);
 			}
 		});
+		
+		let allData = this.matchCTRL.getMapInfo();
+		allData.robot = [];
+		allData.step = this.step;
+		let robotData = this.matchCTRL.getRobotData();
+		(<any>Object).entries(robotData).forEach(([robotID,robot])=>{
+			allData.robot.push(this.selectRobotProperty(robot,'viewer'));
+		});
+		this.exchange.send(new Amqp.Message(JSON.stringify(allData)));
 	}
 
 	public onMessage(client:Client,message:any){
@@ -212,7 +232,11 @@ export class Room<Type> extends EventEmitter{
 	}
 
 	public onDispose(){
-		console.log('Dispose room');
+		this.exchange.delete().then(()=>{
+			console.info(`Delete connection and exchange of room ${this.roomID}`);
+			this.mqConn.close();
+		})
+		console.log(`Dispose room ${this.roomID}`);
 	}
 
 	private _onJoin(client:Client, options?:any): void{

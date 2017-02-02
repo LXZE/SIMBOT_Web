@@ -8,6 +8,7 @@ var room = 0;
 var options = {};
 
 var execute = (robot)=>{
+	console.log('IR = ',robot.IR,' smell = ',robot.smell);
 	robot.turn(-1);
 	robot.move(-1);
 }

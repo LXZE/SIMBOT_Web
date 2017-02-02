@@ -28,7 +28,7 @@ export class Map{
 		let y2 = [310,270,400,70,330,20,400,390,160];
 		for(let i=0;i<9;i++)
 		{
-			let ob = {x:x1[i],w:x2[i],y:y1[i],h:y2[i]};
+			let ob = {x:x1[i],w:x2[i]-x1[i],y:y1[i],h:y2[i]-y1[i]};
 			this.obstacles.push(ob);
 		}
 		this.setFoodPosition({x:720,y:210});

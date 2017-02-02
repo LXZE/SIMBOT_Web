@@ -114,6 +114,7 @@ export class Handler{
 	}
 
 	private disposeRoom(roomID: number, room: Room<any>): void {
+		room.onDispose();
 		delete this.roomList[roomID];
 		room.lockRoom();
 	}
