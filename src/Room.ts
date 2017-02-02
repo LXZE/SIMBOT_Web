@@ -57,7 +57,6 @@ export class Room<Type> extends EventEmitter{
 		this.exchange = this.mqConn.declareExchange(`simbot_exchange_${this.roomID}`,'fanout');
 		this.queue = this.mqConn.declareQueue(`simbot_queue_${this.roomID}`);
 		this.queue.bind(this.exchange);
-		this.exchange.send(new Amqp.Message(`Initial room ${this.roomID}`));
 	}
 
 	public getClientAmount(): number{
