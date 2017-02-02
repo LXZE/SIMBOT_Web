@@ -69,7 +69,7 @@ class Robot {
 var send = (data,step)=>{
 	console.log(`Step ${step} data = ${util.inspect(data)}`);
 	// TODO : remove timeout in production or reduce time
-	var time = 0.1;
+	var time = 0.9;
 	setTimeout(()=>{
 		try{
 			ws.send(msgpack.encode([Sign.CLIENT_DATA,{type:cmdType, step:step, command:data
@@ -155,10 +155,8 @@ var define = ()=>{
 				disconn();
 				break;
 			case Sign.ROOM_DATA:
-				// ev.emit('data',data[1]);
 				status = 'running';
 				run(data[1]);
-				// console.log(data[1]);
 				break;
 			default:
 				ev.emit('info',data[2]);
@@ -174,10 +172,7 @@ var define = ()=>{
 	ws.on('close',()=>{
 		console.log('Disconnected from server');
 	});
-
-
 }
-
 
 var disconn = ()=>{
 	ws.close();

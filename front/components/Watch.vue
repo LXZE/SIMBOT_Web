@@ -156,6 +156,9 @@ export default {
 		this.fetchData();
 	},
 	beforeDestroy (){
+		var canvas = document.getElementById('robotCanvas');
+		var ctx = canvas.getContext('2d');
+		ctx.clearRect(0,0,800,600);	//clear frame
 		this.client.disconnect(function() {
 			console.log("Client disconnect from MQ");
 		});

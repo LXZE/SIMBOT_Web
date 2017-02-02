@@ -79,9 +79,9 @@ export class MatchController{
 		//obstacle check
 		let obs = this.map.getObstacles();
 		for (let ob of obs) {
-			pointList = pointList.concat(Geometry.getLineRectangleIntersectPoints(line,mapRectangle));
+			pointList = pointList.concat(Geometry.getLineRectangleIntersectPoints(line,ob));
 		}
-
+		console.log(pointList);
 		//other robot check - not implemented
 
 		//keep lowest value
