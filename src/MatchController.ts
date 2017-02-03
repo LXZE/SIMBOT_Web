@@ -44,10 +44,18 @@ export class MatchController{
 
 	public doCommand(command:any,commandType:number,setMovementType:number){
 		// TODO: arrange command of robot
-		(<any>Object).entries(command).forEach(([robotID,command])=>{
+		(<any>Object).entries(command).forEach(([robotID,commandList])=>{
 			if(commandType == setMovementType){
-				if('move' in command) this.robotList[robotID].move(command.move);
-				if('turn' in command) this.robotList[robotID].turn(command.turn);
+				for(var cmd of commandList){
+					if(cmd.move){
+						this.robotList[robotID].move(cmd.move);		
+					}
+					else if(cmd.turn){
+						this.robotList[robotID].turn(cmd.turn)
+					}
+				}
+				// if('move' in command) this.robotList[robotID].move(command.move);
+				// if('turn' in command) this.robotList[robotID].turn(command.turn);
 			}
 		});
 		this.setRobotSensorValue();
@@ -81,7 +89,6 @@ export class MatchController{
 		for (let ob of obs) {
 			pointList = pointList.concat(Geometry.getLineRectangleIntersectPoints(line,ob));
 		}
-		console.log(pointList);
 		//other robot check - not implemented
 
 		//keep lowest value

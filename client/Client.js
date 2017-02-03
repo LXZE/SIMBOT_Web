@@ -32,12 +32,27 @@ var connect = (url,name,token,room,overrideExecute)=>{
 var run = (data)=>{
 	let i = 0;
 	let step;
-	data.forEach((elem)=>{
-		let robot = new Robot(i++,elem);
-		step = elem.step;
-		execute(robot);
-	})
-	send(cmdList,step);
+
+	if(execute.length == 2){
+		let exec = data.map((elem)=>{
+			return new Promise((resolve)=>{
+				let robot = new Robot(i++,elem);
+				cmdList[robot.robotID] = []
+				step = elem.step;
+				execute(robot,resolve);
+			})
+		});
+		Promise.all(exec).then(()=>{ send(cmdList,step); });
+	}
+	else{
+		data.forEach((elem,idx)=>{
+			let robot = new Robot(i++,elem);
+			cmdList[robot.robotID] = []
+			step = elem.step;
+			execute(robot);
+		});
+		send(cmdList,step);
+	}
 }
 
 class Robot {
@@ -51,17 +66,19 @@ class Robot {
 		cmdList[data.robot.robotID] = {};
 	}
 	move(val){
-		console.log(`mv ${val} [${this.cmdRank++}]`)
+		console.log(`move ${val} [${this.cmdRank++}]`)
 		cmdType = Sign.CONTINUE_MOTION;
 		if(!cmdList[this.robotID].hasOwnProperty('move')){
-			Object.assign(cmdList[this.robotID],{move:val});
+			// Object.assign(cmdList[this.robotID],{move:val});
+			cmdList[this.robotID].push({move:val})
 		}
 	}
 	turn(deg){
-		console.log(`tr ${deg} [${this.cmdRank++}]`)
+		console.log(`turn ${deg} [${this.cmdRank++}]`)
 		cmdType = Sign.CONTINUE_MOTION;
 		if(!cmdList[this.robotID].hasOwnProperty('turn')){
-			Object.assign(cmdList[this.robotID],{turn:deg});
+			// Object.assign(cmdList[this.robotID],{turn:deg});
+			cmdList[this.robotID].push({turn:deg})
 		}
 	}	
 }
@@ -69,7 +86,7 @@ class Robot {
 var send = (data,step)=>{
 	console.log(`Step ${step} data = ${util.inspect(data)}`);
 	// TODO : remove timeout in production or reduce time
-	var time = 0.9;
+	var time = 0.05;
 	setTimeout(()=>{
 		try{
 			ws.send(msgpack.encode([Sign.CLIENT_DATA,{type:cmdType, step:step, command:data
