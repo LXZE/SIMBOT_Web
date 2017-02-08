@@ -21,7 +21,7 @@
 					label(v-if="room.status !== 'ROOM_RUN'") Access Token = 
 						| {{ room.roomToken }}
 					label(v-else) &nbsp;
-					el-button.deleteBtn(type="danger", icon="delete", size="small", @click="deleteRoom(roomID)") Delete
+					el-button.deleteBtn(v-if="room.status !== 'ROOM_RUN'", type="danger", icon="delete", size="small", @click="deleteRoom(roomID)") Delete
 				p 
 </template>
 <script>

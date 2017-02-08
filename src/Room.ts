@@ -69,7 +69,7 @@ export class Room<Type> extends EventEmitter{
 
 	public start(){
 		if(this.lock && this.status == Sign.ROOM_STOP){
-			console.log(`Room ${this.roomName}[${this.roomID}] start Simulation`);
+			console.info(`Room ${this.roomName}[${this.roomID}] start Simulation`);
 			this.matchCTRL = new MatchController(this);
 
 			this.clients.forEach(client => {
@@ -121,19 +121,19 @@ export class Room<Type> extends EventEmitter{
 	}
 
 	public pause(){
-		console.log(`Room ${this.roomName}[${this.roomID}] pause Simulation`);
+		console.info(`Room ${this.roomName}[${this.roomID}] pause Simulation`);
 		this.removeAllListeners(`trigger_${this.roomID}`);
 		this.status = Sign.ROOM_PAUSE;
 	}
 
 	public resume(){
-		console.log(`Room ${this.roomName}[${this.roomID}] resume Simulation`);
+		console.info(`Room ${this.roomName}[${this.roomID}] resume Simulation`);
 		this.runSimulation();
 		this.status = Sign.ROOM_RUN;
 	}
 
 	public stop(){
-		console.log(`Room ${this.roomName}[${this.roomID}] stop Simulation`);
+		console.info(`Room ${this.roomName}[${this.roomID}] stop Simulation`);
 		this.stopSimulation();
 		this.status = Sign.ROOM_STOP;
 	}
@@ -153,7 +153,7 @@ export class Room<Type> extends EventEmitter{
 			this.matchCTRL.doCommand(data.command,parseInt(data.type),this.movementType);
 		})
 		this.setState();
-		console.log(`${this.roomName}[${this.roomID}] step = `,this.step);
+		console.info(`${this.roomName}[${this.roomID}] step = `,this.step);
 	}
 
 	private stopSimulation(){
@@ -185,7 +185,7 @@ export class Room<Type> extends EventEmitter{
 		if(data.step == this.step){
 			this.gathered[client.id] = data;
 			if(Object.keys(this.gathered).length == this.clients.length){
-				console.log(`step ${this.step} trigerred`);
+				console.info(`step ${this.step} trigerred`);
 				this.emit(`trigger_${this.roomID}`,this.gathered);
 			}
 		}
@@ -198,7 +198,7 @@ export class Room<Type> extends EventEmitter{
 			try{
 				client.send(msg,this.msgOption);
 			}catch(e){
-				console.log(`${client.data.name}[${client.id}] error occured`,e.message);
+				console.info(`${client.data.name}[${client.id}] error occured`,e.message);
 				this.removeClient(client);
 			}
 		});
@@ -216,7 +216,7 @@ export class Room<Type> extends EventEmitter{
 	public onMessage(client:Client,message:any){
 		let data = msgpack.decode(message);
 		if(data[0] == Sign.CLIENT_DATA){
-			console.log(`${this.roomName}[${this.roomID}] get data from user ${client.data.name}[${client.id}] `,data[1]);
+			console.info(`${this.roomName}[${this.roomID}] get data from user ${client.data.name}[${client.id}] `,util.inspect(data[1].command));
 			this.gathering(client,data[1])
 		}
 	}
@@ -235,7 +235,7 @@ export class Room<Type> extends EventEmitter{
 			console.info(`Delete connection and exchange of room ${this.roomID}`);
 			this.mqConn.close();
 		})
-		console.log(`Dispose room ${this.roomID}`);
+		console.info(`Dispose room ${this.roomID}`);
 	}
 
 	private _onJoin(client:Client, options?:any): void{

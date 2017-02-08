@@ -4,7 +4,6 @@ import { Robot } from './Robot';
 import * as Geometry from './Geometry';
 import { Point, Rectangle } from './Geometry';
 
-
 export interface SensorInfo{
 	detected:boolean,
 	distance?:number,
@@ -24,7 +23,6 @@ export class MatchController{
 		this.robotList[robot.robotID] = robot;
 		let sensorValue = robot.getSensorsValue();
 		this.robotList[robot.robotID] = (<any>Object).assign(robot,sensorValue)
-
 	}
 
 	public removeRobot(robotID:string){
@@ -43,7 +41,6 @@ export class MatchController{
 	}
 
 	public doCommand(command:any,commandType:number,setMovementType:number){
-		// TODO: arrange command of robot
 		(<any>Object).entries(command).forEach(([robotID,commandList])=>{
 			if(commandType == setMovementType){
 				for(var cmd of commandList){
@@ -54,8 +51,6 @@ export class MatchController{
 						this.robotList[robotID].turn(cmd.turn)
 					}
 				}
-				// if('move' in command) this.robotList[robotID].move(command.move);
-				// if('turn' in command) this.robotList[robotID].turn(command.turn);
 			}
 		});
 		this.setRobotSensorValue();

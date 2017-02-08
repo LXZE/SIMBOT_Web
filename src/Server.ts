@@ -62,13 +62,13 @@ export class Server extends EventEmitter{
 		}else{
 			throw new Error('Create room failed');
 		}
-		console.log(`Room ${room.roomName}[${room.roomID}] created`);
+		console.info(`Room ${room.roomName}[${room.roomID}] created`);
 		return _.pick(room,['roomID','roomName','status','options']);
 	}
 
 	public deleteRoom(roomID:number,callback?:Function){
 		// TODO : check status before delete then remove all of client in room
-		console.log(`Room [${roomID}] deleted`);
+		console.info(`Room [${roomID}] deleted`);
 		this.handler.delete(roomID);
 	}
 
@@ -106,14 +106,14 @@ export class Server extends EventEmitter{
 			switch (data[0]) {
 				case Sign.CLIENT_NAME:
 					client.data.name = data[1];
-					console.log(`Client ${client.data.name} connected`);
+					console.info(`Client ${client.data.name} connected`);
 					break;
 				case Sign.CLIENT_TOKEN:
 					if(uid.isValid(data[1])){
 						client.data.token = data[1];
 					}
 					else{
-						console.log(`Kick client ${client.name || "anonymous"} because of no token`)
+						console.info(`Kick client ${client.name || "anonymous"} because of no token`)
 						client.close();
 					}
 					break;
@@ -149,7 +149,7 @@ export class Server extends EventEmitter{
 			}else{
 				throw new Error('Join request Failed');
 			}
-			console.log(`Client ${client.data.name} join to room ${room.roomName}[${room.roomID}]`)
+			console.info(`Client ${client.data.name} join to room ${room.roomName}[${room.roomID}]`)
 			return room;
 		}else{
 			throw new Error('room not found');
@@ -164,12 +164,12 @@ export class Server extends EventEmitter{
 		if(roomIDX >= 0){
 			this.clients[client.id].splice(roomIDX,1);
 			(<any>room)._onLeave(client,isDisconnect);
-			console.log(`Client ${client.data.name} leaving room ${room.roomName}[${room.roomID}]`)
+			console.info(`Client ${client.data.name} leaving room ${room.roomName}[${room.roomID}]`)
 		}
 	}
 
 	private onDisconnect (client:Client) {
-		console.log(`Client ${client.data.name} disconnected`);
+		console.info(`Client ${client.data.name} disconnected`);
 		this.emit('disconnect', client);
 		this.handler.clientLeave(client);
 		delete this.clients[client.id];

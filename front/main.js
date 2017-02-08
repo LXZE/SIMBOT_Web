@@ -19,7 +19,7 @@ const app = new Vue({
 	store,
 	watch: {
 	    '$route' (to, from) {
-	      // console.log('test')
+	    	
 	    }
   }
 

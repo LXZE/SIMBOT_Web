@@ -1,9 +1,8 @@
 const WebSocket = require('ws');
-const EventEmiiter = require("events");
 var ws;
-var ev;
 
 const msgpack = require("msgpack-lite");
+// TODO : copy sign to same directory on production
 const Sign = require('../dist/Sign').Sign;
 const async = require('async');
 const request = require('supertest');
@@ -12,16 +11,15 @@ const util = require('util');
 var clientName = 'LXZE';
 var clientID = '';
 var clientToken = '';
-var roomID = '0';
+var roomID = '';
 var msgOptions = {binary: true};
 var status = '';
-var execute = (robot)=>{ robot.move(Math.random()*10); };
+var execute = (robot)=>{ };
 var cmdList = {};
 var cmdType = Sign.CONTINUE_MOTION;
 
 var connect = (url,name,token,room,overrideExecute)=>{
 	ws = new WebSocket(`ws://${url}/`);
-	ev = new EventEmiiter();
 	clientName = name;
 	clientToken = token;
 	roomID = room;
@@ -176,7 +174,6 @@ var define = ()=>{
 				run(data[1]);
 				break;
 			default:
-				ev.emit('info',data[2]);
 				console.log(data[2])
 				break;
 		}

@@ -12,9 +12,10 @@ const getters = {
 const actions = {
 	getRooms ({commit}) {
 		Vue.http.get('/room').then((res)=>{
-			// TODO: check if res.ok
-			commit('RECEIVE_ROOMS',{rooms:res.data, count:Object.keys(res.data).length});
-		})
+			if(res.ok){
+				commit('RECEIVE_ROOMS',{rooms:res.data, count:Object.keys(res.data).length});
+			}
+		});
 	},
 
 	createRoom ({ commit, dispatch }, roomData) {

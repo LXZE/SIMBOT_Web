@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "gulp watch & supervisor -w dist dist/index.js",
     "start": "gulp scripts & gulp webpack & gulp supervisor",
-    "test": "mocha --require ts-node/register test/**Test.ts"
+    "test": "mocha --require ts-node/register test/*.ts"
   },
   "repository": {
     "type": "git",
@@ -42,6 +42,7 @@
     "@types/nunjucks": "0.0.32",
     "@types/supertest": "^2.0.0",
     "@types/underscore": "^1.7.36",
+    "assert": "^1.4.1",
     "babel-core": "^6.0.0",
     "babel-loader": "^6.0.0",
     "babel-plugin-transform-runtime": "^6.0.0",
