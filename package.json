@@ -16,6 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "amqp-ts": "^1.4.0",
+    "axios": "^0.15.3",
     "babel-runtime": "^6.0.0",
     "body-parser": "^1.15.2",
     "dotenv": "^4.0.0",
@@ -27,7 +28,7 @@
     "stompjs": "^2.3.3",
     "underscore": "^1.8.3",
     "vue": "^2.1.0",
-    "vue-resource": "^1.0.3",
+    "vue-axios": "^1.2.2",
     "vue-router": "^2.1.1",
     "vuex": "^2.1.1",
     "ws": "^1.1.1"

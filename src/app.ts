@@ -92,10 +92,6 @@ class App {
 			res.render('index.html');
 		});
 
-		router.get('/watch',(req,res)=>{
-			res.json({a:1});
-		});
-
 		router.get('/room',(req,res)=>{
 			res.json(SV.getRoomList())
 		});

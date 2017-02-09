@@ -22,6 +22,7 @@ export default {
 			// TODO: change to localhost on production
 			url: '10.35.23.97',
 
+			occurred: false,
 			loading: false,
 			id: '',
 			name: '',
@@ -153,21 +154,30 @@ export default {
 		this.draw();
 	},
 	created (){
-		this.fetchData();
+		this.$http.get(`room/${this.$route.params.roomID}`).then((res)=>{
+			if(res.status == 200){
+				this.occurred = true;
+				this.fetchData();
+			}
+		},(err)=>{
+			this.$router.replace({ name: 'index' });
+		})
 	},
 	beforeDestroy (){
-		var canvas = document.getElementById('robotCanvas');
-		var ctx = canvas.getContext('2d');
-		ctx.clearRect(0,0,800,600);	//clear frame
-		this.client.disconnect(function() {
-			console.log("Client disconnect from MQ");
-		});
+		if(this.occurred){
+			var canvas = document.getElementById('robotCanvas');
+			var ctx = canvas.getContext('2d');
+			ctx.clearRect(0,0,800,600);	//clear frame
+			this.client.disconnect(function() {
+				console.log("Client disconnect from MQ");
+			});
+		}
 
 	}
 }
 </script>
 
-<style lang="scss">
+<style lang="sass">
 .watch {
 	font-family: 'Avenir', Helvetica, Arial, sans-serif;
 	-webkit-font-smoothing: antialiased;

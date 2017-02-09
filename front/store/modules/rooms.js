@@ -11,8 +11,8 @@ const getters = {
 
 const actions = {
 	getRooms ({commit}) {
-		Vue.http.get('/room').then((res)=>{
-			if(res.ok){
+		Vue.axios.get('room').then((res)=>{
+			if(res.status == 200){
 				commit('RECEIVE_ROOMS',{rooms:res.data, count:Object.keys(res.data).length});
 			}
 		});
@@ -24,7 +24,7 @@ const actions = {
 			maxPlayer: roomData.maxPlayer,
 			robotPerPlayer: roomData.robotPerPlayer,
 		}
-		Vue.http.post('/create',data).then((res)=>{
+		Vue.axios.post('create',data).then((res)=>{
 			dispatch('getRooms'); 
 		});
 	},
@@ -32,7 +32,7 @@ const actions = {
 	deleteRoom ({ commit, dispatch }, roomID) {
 		confirm(`This room [${roomID}] will deleted from server, proceed?`)
 		?
-			Vue.http.delete(`/${roomID}`).then((res)=>{
+			Vue.axios.delete(`${roomID}`).then((res)=>{
 				commit('DELETE_ROOM',roomID);
 				dispatch('getRooms');
 			})

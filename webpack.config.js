@@ -19,7 +19,7 @@ module.exports = {
     loaders: [
       {
         test: /\.js$/,
-        exclude: /node_modules|vue\/dist|vue-router\/|vue-loader\/|vue-hot-reload-api\//,
+        exclude: /node_modules\/|vue\/dist|vue-router\/|vue-loader\/|vue-hot-reload-api\//,
         loader: 'babel-loader'
       },
       {
@@ -39,7 +39,7 @@ module.exports = {
     ]
   },
   plugins: [
-      new webpack.NoErrorsPlugin()
+      new webpack.NoEmitOnErrorsPlugin(),
   ],
   resolve: {
     alias: {
