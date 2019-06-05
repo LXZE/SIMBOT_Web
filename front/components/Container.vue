@@ -57,7 +57,7 @@ export default {
 }
 </script>
 
-<style lang="sass"> 
+<style lang="scss"> 
 .container {
 	margin-left: 25%;
 	.status {

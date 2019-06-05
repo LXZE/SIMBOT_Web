@@ -50,7 +50,7 @@ export default {
 }
 </script>
 
-<style lang="sass">
+<style lang="scss">
 .sidenav {
   height: 100%;
   width: 20%;

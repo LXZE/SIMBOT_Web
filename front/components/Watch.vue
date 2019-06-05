@@ -20,8 +20,8 @@ export default {
 	data () {
 		return {
 			// TODO: change to localhost on production
-			url: '10.35.23.97',
-
+			url: '0.0.0.0',
+			ws: '',
 			occurred: false,
 			loading: false,
 			id: '',
@@ -75,8 +75,8 @@ export default {
 		fetchData (){ // first load
 			this.loading = true;
 
-			var ws = new WebSocket(`ws://${this.url}:15674/ws`)
-			this.client = Stomp.over(ws);
+			this.ws = new WebSocket(`ws://${this.url}:15674/ws`)
+			this.client = Stomp.over(this.ws);
 			this.client.connect('guest', 'guest', this.on_connect, this.on_error, '/');
 			this.client.heartbeat.outgoing = 0;
 			this.client.heartbeat.incoming = 0;
@@ -177,7 +177,7 @@ export default {
 }
 </script>
 
-<style lang="sass">
+<style lang="scss">
 .watch {
 	font-family: 'Avenir', Helvetica, Arial, sans-serif;
 	-webkit-font-smoothing: antialiased;

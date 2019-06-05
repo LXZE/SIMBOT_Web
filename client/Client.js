@@ -37,6 +37,7 @@ var run = (data)=>{
 				let robot = new Robot(i++,elem);
 				cmdList[robot.robotID] = []
 				step = elem.step;
+				// TODO: do try catch here
 				execute(robot,resolve);
 			})
 		});

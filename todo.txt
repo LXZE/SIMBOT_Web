@@ -1,0 +1,7 @@
+todo : eat action (auto or manual(user call to eat))
+	- when food eaten, TODO: do next action for food (in src/map)
+todo : start stop button & authen
+todo : edit readme.md
+todo : IR fix
+todo : refactor
+todo : rabbitmq setting in docker
