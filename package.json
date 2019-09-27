@@ -1,0 +1,24 @@
+{
+  "name": "simbot_web",
+  "version": "1.16.0",
+  "description": "Descript in detail will be added later.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LXZE/SIMBOT_Web.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LXZE/SIMBOT_Web/issues"
+  },
+  "homepage": "https://github.com/LXZE/SIMBOT_Web#readme",
+  "dependencies": {
+    "dotenv": "^8.1.0",
+    "express": "^4.17.1",
+    "sqlite3": "^4.1.0"
+  }
+}
