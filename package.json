@@ -4,6 +4,8 @@
   "description": "Descript in detail will be added later.",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
+    "dev": "NODE_ENV=dev node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -17,8 +19,25 @@
   },
   "homepage": "https://github.com/LXZE/SIMBOT_Web#readme",
   "dependencies": {
+    "body-parser": "^1.19.0",
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
-    "sqlite3": "^4.1.0"
+    "sqlite3": "^4.1.0",
+    "vue": "^2.6.10",
+    "vue-material": "^1.0.0-beta-11"
+  },
+  "devDependencies": {
+    "css-loader": "^3.2.0",
+    "node-sass": "^4.12.0",
+    "pug": "^2.0.4",
+    "pug-plain-loader": "^1.0.0",
+    "sass-loader": "^8.0.0",
+    "vue-loader": "^15.7.1",
+    "vue-template-compiler": "^2.6.10",
+    "webpack": "^4.41.0",
+    "webpack-cli": "^3.3.9",
+    "webpack-dev-middleware": "^3.7.2",
+    "webpack-dev-server": "^3.8.1",
+    "webpack-hot-middleware": "^2.25.0"
   }
 }
