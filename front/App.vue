@@ -6,14 +6,24 @@
 		md-app-toolbar.md-primary
 			span.md-title Simbot Web
 			.md-toolbar-section-end
-				md-button.md-icon-button(
-					@click="showDialog = true"
-				)
-					md-icon person
+				md-button.md-raised(v-if="!auth")
+					md-avatar.md-avatar-icon.md-small
+						md-icon person
+					span &nbsp; SIGN IN &nbsp;
+				md-menu(md-size="huge" v-else :md-offset-x="-500" :md-offset-y="-50")
+					md-button.md-icon-button(md-menu-trigger)
+						md-icon person
+					md-menu-content
+						md-menu-item
+							md-icon person
+							span.md-list-item-text Username
+
+
 		md-app-content(v-if="roomList.length == 0")
 			md-empty-state(
-				md-icon="dynamic_feed"
-				md-label="Create a room first",
+				md-icon="tv_off"
+				md-label="No room created",
+				md-description="Log in to create a room"
 			)
 		md-app-content(v-else)
 			p 'Poggers'
@@ -23,6 +33,7 @@
 export default {
 	name: 'App',
 	data: ()=>({
+		auth: false,
 		roomList: [],
 		showDialog: false,
 	}),
@@ -57,7 +68,7 @@ export default {
 
 @include md-register-theme("default", (
 	primary: md-get-palette-color(grey, A200),
-	accent: md-get-palette-color(deeporange, A200),
+	accent: md-get-palette-color(white, A200),
 	theme: dark
 ));
 
