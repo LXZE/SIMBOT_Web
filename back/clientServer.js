@@ -10,17 +10,22 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('static'))
 app.use(express.static('dist'))
 
-app.get('/logout', (req, res)=>{
+app.get('/users', (req, res)=>{
 
 })
 
-app.get('/login', (req, res)=>{
+app.post('/signup', (req, res)=>{
+
+})
+
+app.post('/logout', (req, res)=>{
 
 })
 
 app.post('/login', (req, res)=>{
 
 })
+
 
 app.get('/', (req, res)=>{
 	res.sendFile('static/index.html')
@@ -29,6 +34,5 @@ app.get('/', (req, res)=>{
 app.listen(portNumber, ()=>{
 	console.log(`Web server for client is listening to port ${portNumber}`)
 })
-
 
 exports.app = app

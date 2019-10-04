@@ -1,0 +1,16 @@
+- login logout
+- add some user to database
+- save session in cookie
+- check if db is created then mkdir
+
+- write test for backend
+	- site
+		- home
+		- watch
+		- 404 page
+	- account
+		- create user
+		- login credential
+		- user profile
+		- test no user
+		- delete user
