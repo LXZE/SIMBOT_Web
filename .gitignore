@@ -171,4 +171,5 @@ yarn-error.log*
 *.sw?
 
 # Manual
-db/
+db/*
+!db/.gitkeep
